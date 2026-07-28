@@ -746,7 +746,7 @@ Frag mich etwas oder probiere die Quick-Questions unten aus!</div>
     </div>
     <div class="card" style="padding:0;overflow:hidden">
       <table class="hr-table">
-        <thead><tr><th>Datum</th><th>km-Stand</th><th>Maßnahme</th></tr></thead>
+        <thead><tr><th>Datum</th><th>km-Stand</th><th>Maßnahme</th><th></th></tr></thead>
         <tbody id="logTableBody"><tr><td colspan="3" style="color:var(--text3);text-align:center;padding:20px">Wird geladen …</td></tr></tbody>
       </table>
     </div>
@@ -1051,8 +1051,23 @@ function toggleManual(){
   const f=document.getElementById('manualForm'),c=document.getElementById('manualChev')
   const o=f.style.display!=='none'; f.style.display=o?'none':''; c.textContent=o?'▾':'▴'
 }
-function saveManual(){
-  showToast('Manuelle Aktivitäten sind im Worker noch nicht angebunden.','error');
+async function saveManual(){
+  try{
+    const km=document.getElementById('manKm').value;
+    const min=document.getElementById('manMin').value;
+    const name=document.getElementById('manName').value||'Manuelle Aktivität';
+    const hr=document.getElementById('manHr').value;
+    const date=document.getElementById('manDate').value||dateToday();
+    if(!km||!min){ showToast('Distanz und Dauer eingeben','error'); return }
+    await api('/activities/manual',{method:'POST',body:JSON.stringify({
+      name, date, distance_km:Number(km), duration_min:Number(min), avg_hr:hr?Number(hr):null
+    })});
+    showToast(`${name} · ${km} km · ${min} min gespeichert`);
+    document.getElementById('manKm').value=''; document.getElementById('manMin').value='';
+    document.getElementById('manName').value=''; document.getElementById('manHr').value='';
+    toggleManual();
+    await Promise.all([loadDashboard(), loadActivities()]);
+  }catch(e){ showToast(e.message,'error') }
 }
 
 // ── Activities ─────────────────────────────
@@ -1327,11 +1342,53 @@ async function markClean(key){
 function renderLog(){
   const el=document.getElementById('logTableBody'); if(!el) return
   if(!maintLog.length){
-    el.innerHTML='<tr><td colspan="3" style="color:var(--text3);text-align:center;padding:20px">Noch keine Wartungseinträge.</td></tr>'
+    el.innerHTML='<tr><td colspan="4" style="color:var(--text3);text-align:center;padding:20px">Noch keine Wartungseinträge.</td></tr>'
     return
   }
   const sorted=maintLog.slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
-  el.innerHTML=sorted.map(x=>`<tr><td>${fmtDate(x.date)}</td><td>${x.km_at_time!=null?`<span style="color:var(--accent);font-weight:700;font-family:'Barlow Condensed',sans-serif;font-size:15px">${Number(x.km_at_time).toLocaleString('de-DE')} km</span>`:'–'}</td><td>${esc(x.description)}</td></tr>`).join('');
+  el.innerHTML=sorted.map(x=>`<tr id="maint-row-${x.id}">
+    <td>${fmtDate(x.date)}</td>
+    <td>${x.km_at_time!=null?`<span style="color:var(--accent);font-weight:700;font-family:'Barlow Condensed',sans-serif;font-size:15px">${Number(x.km_at_time).toLocaleString('de-DE')} km</span>`:'–'}</td>
+    <td>${esc(x.description)}</td>
+    <td style="white-space:nowrap;text-align:right">
+      <button class="btn btn-ghost" style="font-size:11px;padding:4px 9px" onclick="editMaintRow(${x.id})">✎</button>
+      <button class="btn btn-ghost" style="font-size:11px;padding:4px 9px;margin-left:4px" onclick="deleteMaintRow(${x.id})">🗑</button>
+    </td>
+  </tr>`).join('');
+}
+
+function editMaintRow(id){
+  const x=maintLog.find(m=>m.id===id); if(!x) return;
+  const row=document.getElementById('maint-row-'+id); if(!row) return;
+  row.innerHTML=`
+    <td><input type="date" class="field" id="edit-date-${id}" value="${(x.date||'').slice(0,10)}" style="padding:6px 8px"/></td>
+    <td><input type="number" class="field" id="edit-km-${id}" value="${x.km_at_time??''}" style="padding:6px 8px;width:100px"/></td>
+    <td><input type="text" class="field" id="edit-desc-${id}" value="${esc(x.description)}" style="padding:6px 8px"/></td>
+    <td style="white-space:nowrap;text-align:right">
+      <button class="btn btn-primary" style="font-size:11px;padding:4px 10px" onclick="saveMaintEdit(${id})">✓</button>
+      <button class="btn btn-ghost" style="font-size:11px;padding:4px 9px;margin-left:4px" onclick="renderLog()">✕</button>
+    </td>`;
+}
+
+async function saveMaintEdit(id){
+  try{
+    const date=document.getElementById('edit-date-'+id).value;
+    const km=document.getElementById('edit-km-'+id).value;
+    const desc=document.getElementById('edit-desc-'+id).value.trim();
+    if(!desc){ showToast('Maßnahme darf nicht leer sein','error'); return }
+    await api('/bike/maintenance/'+id,{method:'PUT',body:JSON.stringify({date,description:desc,km_at_time:km?Number(km):null})});
+    showToast('Eintrag aktualisiert');
+    loadBike();
+  }catch(e){ showToast(e.message,'error') }
+}
+
+async function deleteMaintRow(id){
+  if(!confirm('Diesen Wartungseintrag wirklich löschen?')) return;
+  try{
+    await api('/bike/maintenance/'+id,{method:'DELETE'});
+    showToast('Eintrag gelöscht');
+    loadBike();
+  }catch(e){ showToast(e.message,'error') }
 }
 function toggleLogForm(){const f=document.getElementById('logForm');f.style.display=f.style.display==='none'?'':'none'}
 async function saveLog(){
