@@ -516,30 +516,6 @@ Claude analysiert dann:
 ══════════════════════════════════════════ -->
 <div id="tab-activities" style="display:none" class="fade">
 
-  <!-- Manuelle Aktivität -->
-  <div class="card" style="margin-bottom:16px;border-left:3px solid var(--accent)">
-    <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleManual()">
-      <div style="display:flex;align-items:center;gap:12px">
-        <div style="font-size:18px">+</div>
-        <div>
-          <div style="font-weight:700;font-size:14px;color:var(--text)">Manuelle Aktivität eintragen</div>
-          <div style="font-size:12px;color:var(--text3);margin-top:2px">Training ohne Strava · Pendeln · Indoor</div>
-        </div>
-      </div>
-      <span id="manualChev" style="color:var(--text3);font-size:14px;font-weight:700">▾</span>
-    </div>
-    <div id="manualForm" style="display:none;margin-top:18px;padding-top:18px;border-top:1px solid var(--border)">
-      <div style="display:grid;grid-template-columns:repeat(3,1fr) 1fr;gap:12px;margin-bottom:12px">
-        <div><label class="field-label">Datum</label><input type="date" class="field" id="manDate" /></div>
-        <div><label class="field-label">Distanz (km)</label><input type="number" class="field" id="manKm" placeholder="z.B. 12" step="0.1"/></div>
-        <div><label class="field-label">Dauer (min)</label><input type="number" class="field" id="manMin" placeholder="z.B. 35"/></div>
-        <div><label class="field-label">Ø Puls</label><input type="number" class="field" id="manHr" placeholder="optional"/></div>
-      </div>
-      <div style="margin-bottom:12px"><label class="field-label">Bezeichnung</label><input type="text" class="field" id="manName" placeholder="z.B. Training zur Arbeit"/></div>
-      <button class="btn btn-primary" onclick="saveManual()" style="padding:9px 20px">Aktivität speichern</button>
-    </div>
-  </div>
-
   <div class="section-label" id="actsCountLabel">Alle Touren</div>
   <div id="all-acts"></div>
 </div>
@@ -1046,30 +1022,6 @@ async function startAnalysis(stravaId){
   finally{ btn.disabled=false; btn.innerHTML=oldHtml }
 }
 
-// ── Manual activity (not yet backed by Worker) ──
-function toggleManual(){
-  const f=document.getElementById('manualForm'),c=document.getElementById('manualChev')
-  const o=f.style.display!=='none'; f.style.display=o?'none':''; c.textContent=o?'▾':'▴'
-}
-async function saveManual(){
-  try{
-    const km=document.getElementById('manKm').value;
-    const min=document.getElementById('manMin').value;
-    const name=document.getElementById('manName').value||'Manuelle Aktivität';
-    const hr=document.getElementById('manHr').value;
-    const date=document.getElementById('manDate').value||dateToday();
-    if(!km||!min){ showToast('Distanz und Dauer eingeben','error'); return }
-    await api('/activities/manual',{method:'POST',body:JSON.stringify({
-      name, date, distance_km:Number(km), duration_min:Number(min), avg_hr:hr?Number(hr):null
-    })});
-    showToast(`${name} · ${km} km · ${min} min gespeichert`);
-    document.getElementById('manKm').value=''; document.getElementById('manMin').value='';
-    document.getElementById('manName').value=''; document.getElementById('manHr').value='';
-    toggleManual();
-    await Promise.all([loadDashboard(), loadActivities()]);
-  }catch(e){ showToast(e.message,'error') }
-}
-
 // ── Activities ─────────────────────────────
 async function loadActivities(){
   const el=$('all-acts');
@@ -1432,7 +1384,8 @@ function renderArchive() {
         <div style="font-size:12px;color:var(--text3);margin-top:2px">${esc(b.type||'Bike')} · ${b.year||'–'}</div>
         <div style="margin-top:6px"><span class="badge" style="background:var(--surface);color:var(--text3);border:1px solid var(--border)">${Number(b.km_total||0).toLocaleString('de-DE')} km</span></div>
       </div>
-      <button class="btn btn-ghost" onclick="restoreBike(${b.id})" style="font-size:11px;padding:6px 12px">↩ Reaktivieren</button>`
+      <button class="btn btn-ghost" onclick="restoreBike(${b.id})" style="font-size:11px;padding:6px 12px">↩ Reaktivieren</button>
+      <button class="btn btn-ghost" onclick="deleteBike(${b.id},'${esc(b.name).replace(/'/g,"\\'")}')" style="font-size:11px;padding:6px 12px;margin-left:6px;color:var(--red);border-color:rgba(239,68,68,.3)">🗑 Löschen</button>`
     el.appendChild(d)
   })
 }
@@ -1441,6 +1394,15 @@ async function restoreBike(id){
   try{
     await api('/bike/'+id+'/reactivate',{method:'POST'});
     showToast('Bike reaktiviert');
+    loadBike();
+  }catch(e){ showToast(e.message,'error') }
+}
+
+async function deleteBike(id,name){
+  if(!confirm(`"${name}" wirklich endgültig löschen? Das kann nicht rückgängig gemacht werden (inkl. Wartungslog dieses Rads).`)) return;
+  try{
+    await api('/bike/'+id,{method:'DELETE'});
+    showToast('Bike gelöscht');
     loadBike();
   }catch(e){ showToast(e.message,'error') }
 }
@@ -1475,7 +1437,6 @@ function showToast(msg,type='ok'){
 }
 
 // ── Init ───────────────────────────────────
-document.getElementById('manDate') && (document.getElementById('manDate').value=dateToday());
 document.getElementById('hrDate') && (document.getElementById('hrDate').value=dateToday());
 document.getElementById('manBikeDate') && (document.getElementById('manBikeDate').value=dateToday());
 document.getElementById('logDate') && (document.getElementById('logDate').value=dateToday());
