@@ -1431,9 +1431,18 @@ function renderArchive() {
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:var(--text2)">${esc(b.name)}</div>
         <div style="font-size:12px;color:var(--text3);margin-top:2px">${esc(b.type||'Bike')} · ${b.year||'–'}</div>
         <div style="margin-top:6px"><span class="badge" style="background:var(--surface);color:var(--text3);border:1px solid var(--border)">${Number(b.km_total||0).toLocaleString('de-DE')} km</span></div>
-      </div>`
+      </div>
+      <button class="btn btn-ghost" onclick="restoreBike(${b.id})" style="font-size:11px;padding:6px 12px">↩ Reaktivieren</button>`
     el.appendChild(d)
   })
+}
+
+async function restoreBike(id){
+  try{
+    await api('/bike/'+id+'/reactivate',{method:'POST'});
+    showToast('Bike reaktiviert');
+    loadBike();
+  }catch(e){ showToast(e.message,'error') }
 }
 function openNewBikeModal(){
   document.getElementById('newBikeName').value=''
