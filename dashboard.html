@@ -823,6 +823,15 @@ Demo-Modus aktiv. Probiere die Quick-Questions unten aus!</div>
 </div>
 
 <script>
+// ── Worker Konfiguration ───────────────────
+const WORKER_URL = 'https://radcoach-worker.bmx282.workers.dev'
+const API_KEY    = 'RadcoachFrank2026!'
+
+const api = (path, opts={}) => fetch(WORKER_URL + path, {
+  ...opts,
+  headers: { 'X-API-Key': API_KEY, 'Content-Type': 'application/json', ...(opts.headers||{}) }
+}).then(r => r.json())
+
 // ── Demo Data ──────────────────────────────
 const ACTIVITIES = [
   {id:1,name:'Morgenrunde Königsbach',   date:'2026-07-26',km:52.3, dur:'1h 48m',ele:480, hr:142,tss:68, url:'#'},
