@@ -5,25 +5,36 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Trainings-Dashboard · KI-Radcoach</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- App-Icon für iPhone/iPad Homescreen -->
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <!-- Favicon für Browser-Tabs (Edge etc.) -->
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
+  <!-- PWA-Name -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="FS Cycling">
+
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
     :root{
-      --bg:        #0d0f14;
-      --surface:   #13161e;
-      --surface2:  #1a1e2a;
-      --border:    #252a38;
-      --border2:   #2e3447;
-      --text:      #e8ecf4;
-      --text2:     #8892a4;
-      --text3:     #4a5368;
-      --accent:    #3b82f6;
-      --accent2:   #1d6bf3;
-      --green:     #22c55e;
-      --orange:    #f97316;
-      --red:       #ef4444;
-      --purple:    #a855f7;
-      --cyan:      #06b6d4;
+      --bg:        #f0f3f8;
+      --surface:   #ffffff;
+      --surface2:  #f5f7fc;
+      --border:    #dde2ef;
+      --border2:   #c8d0e4;
+      --text:      #111827;
+      --text2:     #374151;
+      --text3:     #6b7280;
+      --accent:    #2563eb;
+      --accent2:   #1d55d4;
+      --green:     #16a34a;
+      --orange:    #ea6c00;
+      --red:       #dc2626;
+      --purple:    #7c3aed;
+      --cyan:      #0891b2;
     }
 
     body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
@@ -182,7 +193,7 @@
 
     /* ── KI ANALYSE ── */
     .analysis-box{
-      background:var(--surface2);border:1px solid var(--border2);border-radius:10px;
+      background:var(--surface2);border:1px solid var(--border);border-radius:10px;
       padding:18px;font-size:13px;line-height:1.85;color:var(--text2);
       white-space:pre-wrap;min-height:130px;
     }
@@ -205,7 +216,7 @@
       display:grid;align-items:center;gap:12px;
       grid-template-columns:1fr repeat(4,90px) 120px 24px;
     }
-    .act-body{border-top:1px solid var(--border);padding:16px 18px;background:var(--surface2)}
+    .act-body{border-top:2px solid var(--border2);padding:16px 18px;background:var(--surface2)}
     .act-name{font-weight:700;font-size:14px;color:var(--text);margin-bottom:2px}
     .act-date{font-size:11px;color:var(--text3);font-weight:500}
     .act-metric{font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px}
@@ -254,7 +265,7 @@
     }
     .field:focus{border-color:var(--accent)}
     .field::placeholder{color:var(--text3)}
-    select.field option{background:var(--surface2)}
+    select.field option{background:var(--surface);color:var(--text)}
 
     /* ── PROGRESS BAR ── */
     .prog-track{width:100%;height:4px;background:var(--border2);border-radius:2px;overflow:hidden;margin-top:8px}
@@ -263,10 +274,13 @@
     /* ── HEALTH ── */
     .hr-table{width:100%;border-collapse:collapse;font-size:13px}
     .hr-table th{
-      text-align:left;color:var(--text3);font-weight:700;padding:10px 14px;
-      border-bottom:1px solid var(--border);font-size:10px;
+      text-align:left;color:var(--text);font-weight:800;padding:11px 14px;
+      border-bottom:2px solid var(--border2);font-size:11px;
       text-transform:uppercase;letter-spacing:.08em;
+      background:var(--surface2);
     }
+    .hr-table th:first-child{border-radius:8px 0 0 0}
+    .hr-table th:last-child{border-radius:0 8px 0 0}
     .hr-table td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text2)}
     .hr-table tr:last-child td{border-bottom:none}
     .hr-table tr:hover td{background:var(--surface2)}
@@ -562,21 +576,6 @@ Claude analysiert dann:
     </div>
   </div>
 
-  <!-- TRAININGSPLAN -->
-  <div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-      <div class="section-label">KI-Trainingsplan · Nächste Woche</div>
-      <button class="btn btn-primary" onclick="requestPlan()" id="planBtn" style="font-size:12px;padding:7px 14px">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        Plan erstellen
-      </button>
-    </div>
-    <div class="card" style="border-top:2px solid var(--purple)">
-      <div class="analysis-box" id="planBox">
-        <span style="color:var(--text3)">Klicke auf „Plan erstellen" für einen personalisierten 7-Tage-Trainingsplan basierend auf deiner aktuellen Form und deinem Ziel.</span>
-      </div>
-    </div>
-  </div>
 
 </div><!-- /dashboard -->
 
@@ -1006,22 +1005,6 @@ async function saveGoal(){
   }catch(e){ showToast(e.message,'error') }
 }
 
-// ── Trainingsplan ──────────────────────────
-async function requestPlan(){
-  const btn=$('planBtn'), box=$('planBox'); if(!btn||!box) return;
-  btn.disabled=true; btn.innerHTML='<span class="spin">↻</span> Erstelle Plan…';
-  box.innerHTML='<span style="color:var(--text3)">Claude erstellt deinen persönlichen Trainingsplan…</span>';
-  try{
-    const d=await api('/coach/plan',{method:'POST',body:JSON.stringify({model:chatModel})});
-    box.style.color='var(--text2)';
-    box.innerHTML=d.plan?renderMarkdown(d.plan):'Plan nicht verfügbar.';
-  }catch(e){ box.innerHTML=`<span style="color:var(--red)">${esc(e.message)}</span>` }
-  finally{
-    btn.disabled=false;
-    btn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Plan erstellen';
-  }
-}
-
 // ── Sync-Erinnerung ────────────────────────
 function dismissReminder(){
   const el=$('maintReminderBox'); if(el) el.style.display='none';
@@ -1159,7 +1142,7 @@ async function drawLoadChart() {
 
   if(!chartData.length){
     ctx.clearRect(0,0,W,H);
-    ctx.fillStyle='#4a5368';ctx.font='13px Inter,sans-serif'
+    ctx.fillStyle='#9ca3af';ctx.font='13px Inter,sans-serif'
     ctx.fillText('Noch keine Verlaufsdaten vorhanden',W/2-100,H/2); return
   }
 
@@ -1169,7 +1152,7 @@ async function drawLoadChart() {
   const bv=bars.flatMap(k=>chartData.map(d=>d[k]).filter(v=>v!=null))
   ctx.clearRect(0,0,W,H)
   if(!lines.length&&!bars.length){
-    ctx.fillStyle='#4a5368';ctx.font='13px Inter,sans-serif'
+    ctx.fillStyle='#9ca3af';ctx.font='13px Inter,sans-serif'
     ctx.fillText('Keine Datenreihe aktiv',W/2-80,H/2); return
   }
 
@@ -1181,14 +1164,14 @@ async function drawLoadChart() {
   const yL=v=>p.t+cH-((v-minL)/(maxL-minL||1))*cH
   const yB=v=>p.t+cH-(v/(maxB||1))*cH
 
-  ctx.strokeStyle='#1a1e2a'; ctx.lineWidth=1
+  ctx.strokeStyle='#dde2ef'; ctx.lineWidth=1
   for(let s=0;s<=5;s++){
     const v=minL+((maxL-minL)/5)*s, y=yL(v)
     ctx.beginPath(); ctx.moveTo(p.l,y); ctx.lineTo(p.l+cW,y); ctx.stroke()
-    if(lv.length){ctx.fillStyle='#4a5368';ctx.font='10px Inter,sans-serif';ctx.fillText(Math.round(v),2,y+3)}
+    if(lv.length){ctx.fillStyle='#6b7280';ctx.font='10px Inter,sans-serif';ctx.fillText(Math.round(v),2,y+3)}
   }
   if(lv.length&&minL<0&&maxL>0){
-    ctx.strokeStyle='#252a38';ctx.setLineDash([4,3])
+    ctx.strokeStyle='#c8d0e4';ctx.setLineDash([4,3])
     ctx.beginPath();ctx.moveTo(p.l,yL(0));ctx.lineTo(p.l+cW,yL(0));ctx.stroke()
     ctx.setLineDash([])
   }
@@ -1227,7 +1210,7 @@ async function drawLoadChart() {
     ctx.stroke(); ctx.setLineDash([])
   })
 
-  ctx.fillStyle='#4a5368'; ctx.font='10px Inter,sans-serif'
+  ctx.fillStyle='#6b7280'; ctx.font='10px Inter,sans-serif'
   const step=Math.max(1,Math.floor(chartData.length/7))
   chartData.forEach((_,i)=>{
     if(i%step&&i!==chartData.length-1) return
@@ -1424,7 +1407,7 @@ function drawHrChart(entries){
   ctx.clearRect(0,0,W,120)
   const data=(entries&&entries.length)?entries.slice(-7):[];
   if(!data.length){
-    ctx.fillStyle='#4a5368'; ctx.font='12px Inter,sans-serif';
+    ctx.fillStyle='#9ca3af'; ctx.font='12px Inter,sans-serif';
     ctx.fillText('Noch keine Ruhepulsdaten',W/2-80,60);
     return;
   }
@@ -1433,10 +1416,10 @@ function drawHrChart(entries){
   const mn=Math.min(...hr)-3,mx=Math.max(...hr)+3,rng=(mx-mn)||1
   const xP=i=>p.l+(hr.length>1?(i/(hr.length-1))*cW:cW/2), yP=v=>p.t+cH-((v-mn)/rng)*cH
 
-  ctx.strokeStyle='#1a1e2a'; ctx.lineWidth=1
+  ctx.strokeStyle='#dde2ef'; ctx.lineWidth=1
   for(let v=Math.ceil(mn/5)*5;v<=mx;v+=5){
     const y=yP(v); ctx.beginPath(); ctx.moveTo(p.l,y); ctx.lineTo(p.l+cW,y); ctx.stroke()
-    ctx.fillStyle='#4a5368'; ctx.font='10px Inter,sans-serif'; ctx.fillText(v,2,y+3)
+    ctx.fillStyle='#6b7280'; ctx.font='10px Inter,sans-serif'; ctx.fillText(v,2,y+3)
   }
   const gr=ctx.createLinearGradient(0,p.t,0,p.t+cH)
   gr.addColorStop(0,'rgba(239,68,68,.2)'); gr.addColorStop(1,'rgba(239,68,68,.02)')
@@ -1448,7 +1431,7 @@ function drawHrChart(entries){
   hr.forEach((v,i)=>{
     ctx.fillStyle='var(--surface)'; ctx.beginPath(); ctx.arc(xP(i),yP(v),3.5,0,Math.PI*2); ctx.fill()
     ctx.strokeStyle='#ef4444'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(xP(i),yP(v),3.5,0,Math.PI*2); ctx.stroke()
-    ctx.fillStyle='#4a5368'; ctx.font='10px Inter,sans-serif'; ctx.fillText(lbl[i],xP(i)-10,120-5)
+    ctx.fillStyle='#6b7280'; ctx.font='10px Inter,sans-serif'; ctx.fillText(lbl[i],xP(i)-10,120-5)
   })
 }
 
