@@ -288,6 +288,26 @@
       margin-bottom:8px;opacity:.65;
     }
 
+    /* ── HEATMAP ── */
+    .heatmap-cell{
+      width:30px;height:30px;border-radius:5px;
+      cursor:default;flex-shrink:0;transition:transform .15s;
+    }
+    .heatmap-cell:hover{transform:scale(1.2)}
+    .heatmap-row{display:flex;gap:5px;align-items:center}
+    .heatmap-label{font-size:10px;color:var(--text3);width:28px;text-align:right;flex-shrink:0}
+
+    /* ── GOAL CARD ── */
+    .goal-display{
+      font-size:13px;color:var(--text);font-weight:600;
+      padding:10px 12px;background:var(--surface2);border:1px solid var(--border2);
+      border-radius:8px;margin-bottom:10px;line-height:1.5;min-height:38px;
+    }
+
+    /* ── FILTER BAR ── */
+    .filter-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+    .filter-bar .field{padding:7px 10px}
+
     /* ── MISC ── */
     .demo-bar{
       background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);
@@ -340,7 +360,10 @@
 
     <div class="connection-pill" id="connPill">
       <div class="live-dot" id="connDot" style="background:var(--orange);animation:none"></div>
-      <span id="connText">Verbindung wird geprüft …</span>
+      <div>
+        <span id="connText">Verbindung wird geprüft …</span>
+        <div id="lastSyncText" style="font-size:9px;color:var(--text3);font-weight:500;margin-top:1px"></div>
+      </div>
     </div>
 
     <button class="btn btn-danger" onclick="connectOrSync()" id="syncBtn">
@@ -396,6 +419,37 @@
       <div class="stat-label">Ø Herzfrequenz</div>
       <div><span class="stat-value" id="statHr">–</span><span class="stat-unit">bpm</span></div>
       <div class="stat-sub">Aus Strava-Daten</div>
+    </div>
+  </div>
+
+  <!-- HEATMAP + STREAK + ZIEL -->
+  <div style="display:grid;grid-template-columns:1fr 220px;gap:16px">
+    <!-- Heatmap -->
+    <div class="card">
+      <div class="card-label">Trainingsaktivität · 12 Wochen</div>
+      <div id="heatmapGrid"></div>
+      <div id="heatmapLegend" style="display:flex;align-items:center;gap:5px;margin-top:10px;font-size:10px;color:var(--text3)">
+        Weniger
+        <span style="width:10px;height:10px;border-radius:2px;background:var(--border);display:inline-block"></span>
+        <span style="width:10px;height:10px;border-radius:2px;background:rgba(59,130,246,.2);display:inline-block"></span>
+        <span style="width:10px;height:10px;border-radius:2px;background:rgba(59,130,246,.5);display:inline-block"></span>
+        <span style="width:10px;height:10px;border-radius:2px;background:var(--accent);display:inline-block"></span>
+        Mehr
+      </div>
+    </div>
+    <!-- Streak + Ziel -->
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="stat-card" style="--c:var(--orange)">
+        <div class="stat-label">Aktive Wochen 🔥</div>
+        <div><span class="stat-value" id="streakVal">–</span><span class="stat-unit">Wochen</span></div>
+        <div class="stat-sub">in Folge trainiert</div>
+      </div>
+      <div class="card" style="border-top:2px solid var(--purple);flex:1">
+        <div class="section-label" style="margin-bottom:8px">Mein Ziel</div>
+        <div class="goal-display" id="goalDisplay">Kein Ziel gesetzt</div>
+        <input type="text" class="field" id="goalInput" placeholder="z.B. Ötztaler 24. Aug, 238 km" style="margin-bottom:8px"/>
+        <button class="btn btn-primary" onclick="saveGoal()" style="width:100%;justify-content:center;padding:8px;font-size:12px">Ziel speichern</button>
+      </div>
     </div>
   </div>
 
@@ -508,6 +562,22 @@ Claude analysiert dann:
     </div>
   </div>
 
+  <!-- TRAININGSPLAN -->
+  <div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="section-label">KI-Trainingsplan · Nächste Woche</div>
+      <button class="btn btn-primary" onclick="requestPlan()" id="planBtn" style="font-size:12px;padding:7px 14px">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Plan erstellen
+      </button>
+    </div>
+    <div class="card" style="border-top:2px solid var(--purple)">
+      <div class="analysis-box" id="planBox">
+        <span style="color:var(--text3)">Klicke auf „Plan erstellen" für einen personalisierten 7-Tage-Trainingsplan basierend auf deiner aktuellen Form und deinem Ziel.</span>
+      </div>
+    </div>
+  </div>
+
 </div><!-- /dashboard -->
 
 
@@ -516,6 +586,13 @@ Claude analysiert dann:
 ══════════════════════════════════════════ -->
 <div id="tab-activities" style="display:none" class="fade">
 
+  <div class="filter-bar">
+    <input type="text" class="field" id="tourSearch" placeholder="🔍 Tour suchen…" oninput="filterTours()" style="max-width:200px"/>
+    <input type="number" class="field" id="filterMinKm" placeholder="Min km" oninput="filterTours()" style="max-width:90px"/>
+    <input type="number" class="field" id="filterMaxKm" placeholder="Max km" oninput="filterTours()" style="max-width:90px"/>
+    <span style="font-size:11px;color:var(--text3)" id="filterInfo"></span>
+    <span class="badge" style="background:rgba(59,130,246,.1);color:var(--accent);border:1px solid rgba(59,130,246,.2);margin-left:auto;font-size:12px;padding:4px 12px" id="totalKmBadge">– km gesamt</span>
+  </div>
   <div class="section-label" id="actsCountLabel">Alle Touren</div>
   <div id="all-acts"></div>
 </div>
@@ -638,6 +715,13 @@ Frag mich etwas oder probiere die Quick-Questions unten aus!</div>
 ══════════════════════════════════════════ -->
 <div id="tab-bike" style="display:none" class="fade">
 
+  <!-- Sync-Erinnerung -->
+  <div id="maintReminderBox" style="display:none;margin-bottom:16px" class="demo-bar">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <span id="maintReminderText" style="flex:1"></span>
+    <button onclick="dismissReminder()" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:18px;line-height:1;padding:0 4px">×</button>
+  </div>
+
   <!-- Aktives Rad -->
   <div class="bike-header-card" style="margin-bottom:16px">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
@@ -699,7 +783,24 @@ Frag mich etwas oder probiere die Quick-Questions unten aus!</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
           <div><label class="field-label">Datum</label><input type="date" class="field" id="logDate" /></div>
           <div><label class="field-label">km-Stand</label><input type="number" class="field" id="logKm" placeholder="z.B. 3247"/></div>
-          <div><label class="field-label">Maßnahme</label><input type="text" class="field" id="logDesc" placeholder="z.B. Kette gewechselt"/></div>
+          <div>
+            <label class="field-label">Maßnahme</label>
+            <input type="text" class="field" id="logDesc" list="maintSuggestions" placeholder="z.B. Kette gewechselt"/>
+            <datalist id="maintSuggestions">
+              <option value="Kette gewechselt"/>
+              <option value="Kette geschmiert"/>
+              <option value="Kassette gewechselt"/>
+              <option value="Bremsbeläge gewechselt"/>
+              <option value="Reifen gewechselt"/>
+              <option value="Schlauch gewechselt"/>
+              <option value="Großer Service"/>
+              <option value="Schaltung eingestellt"/>
+              <option value="Bremsen eingestellt"/>
+              <option value="Laufräder zentriert"/>
+              <option value="Rad gewaschen"/>
+              <option value="Kette geölt"/>
+            </datalist>
+          </div>
         </div>
         <div style="display:flex;gap:8px">
           <button class="btn btn-primary" onclick="saveLog()" style="padding:8px 18px">Speichern</button>
@@ -847,18 +948,106 @@ function findMaintBaseline(m){
   return matches.slice().sort((a,b)=>new Date(b.date)-new Date(a.date))[0]
 }
 
+// ── Weekly Stats / Heatmap ─────────────────
+async function loadWeeklyStats(){
+  try{
+    const d=await api('/stats/weekly');
+    $('streakVal').textContent=d.streak||0;
+    drawHeatmap(d.weeks||[]);
+  }catch(e){ /* silent */ }
+}
+
+function drawHeatmap(weeks){
+  const el=$('heatmapGrid'); if(!el) return;
+  el.innerHTML='';
+  const maxKm=Math.max(...weeks.map(w=>w.km),1);
+  const row=document.createElement('div'); row.className='heatmap-row';
+  // Fülle auf 12 Wochen auf
+  const padded=[...Array(Math.max(0,12-weeks.length)).fill(null), ...weeks];
+  padded.forEach(w=>{
+    const cell=document.createElement('div'); cell.className='heatmap-cell';
+    if(!w||!w.km){
+      cell.style.background='var(--border)'; cell.style.opacity='.4';
+    } else {
+      const pct=w.km/maxKm;
+      cell.style.background=pct<0.25?'rgba(59,130,246,.2)':pct<0.5?'rgba(59,130,246,.4)':pct<0.75?'rgba(59,130,246,.65)':'var(--accent)';
+      const d=new Date(w.week_start);
+      cell.title=`KW ${d.getDate()}.${d.getMonth()+1}.: ${w.km} km · ${w.tss} TSS · ${w.rides} Tour${w.rides!==1?'en':''}`;
+    }
+    row.appendChild(cell);
+  });
+  el.appendChild(row);
+  // Wochen-Labels
+  const lblRow=document.createElement('div'); lblRow.style.cssText='display:flex;gap:5px;margin-top:4px';
+  padded.forEach(w=>{
+    const lbl=document.createElement('div'); lbl.style.cssText='width:30px;font-size:9px;color:var(--text3);text-align:center;flex-shrink:0';
+    if(w){const d=new Date(w.week_start);lbl.textContent=`${d.getDate()}.${d.getMonth()+1}.`}
+    lblRow.appendChild(lbl);
+  });
+  el.appendChild(lblRow);
+}
+
+// ── Ziel ───────────────────────────────────
+async function loadGoal(){
+  try{
+    const d=await api('/goal');
+    if(d.goal){
+      $('goalDisplay').textContent=d.goal;
+      if($('goalInput')) $('goalInput').value=d.goal;
+    }
+  }catch(e){ /* silent */ }
+}
+async function saveGoal(){
+  const val=$('goalInput')?.value?.trim(); if(!val){showToast('Bitte Ziel eingeben','error');return;}
+  try{
+    await api('/goal',{method:'POST',body:JSON.stringify({goal:val})});
+    $('goalDisplay').textContent=val;
+    showToast('Ziel gespeichert');
+  }catch(e){ showToast(e.message,'error') }
+}
+
+// ── Trainingsplan ──────────────────────────
+async function requestPlan(){
+  const btn=$('planBtn'), box=$('planBox'); if(!btn||!box) return;
+  btn.disabled=true; btn.innerHTML='<span class="spin">↻</span> Erstelle Plan…';
+  box.innerHTML='<span style="color:var(--text3)">Claude erstellt deinen persönlichen Trainingsplan…</span>';
+  try{
+    const d=await api('/coach/plan',{method:'POST',body:JSON.stringify({model:chatModel})});
+    box.style.color='var(--text2)';
+    box.innerHTML=d.plan?renderMarkdown(d.plan):'Plan nicht verfügbar.';
+  }catch(e){ box.innerHTML=`<span style="color:var(--red)">${esc(e.message)}</span>` }
+  finally{
+    btn.disabled=false;
+    btn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Plan erstellen';
+  }
+}
+
+// ── Sync-Erinnerung ────────────────────────
+function dismissReminder(){
+  const el=$('maintReminderBox'); if(el) el.style.display='none';
+}
+
 // ── Tab switching ──────────────────────────
 function switchTab(id, btn) {
   document.querySelectorAll('[id^="tab-"]').forEach(el=>el.style.display='none')
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'))
   document.getElementById('tab-'+id).style.display=''
   btn.classList.add('active')
-  if(id==='dashboard') setTimeout(()=>{drawLoadChart();},50)
+  if(id==='dashboard') setTimeout(()=>{drawLoadChart(); drawHeatmap([]);},50)
   if(id==='health') setTimeout(()=>{drawHrChart();},50)
 }
 
 // ── Connection / Sync ──────────────────────
-function setStatus(ok,text){
+function fmtSyncTime(iso){
+  if(!iso) return '';
+  const d=new Date(iso), now=new Date();
+  const diff=Math.floor((now-d)/60000);
+  if(diff<1) return 'gerade eben';
+  if(diff<60) return `vor ${diff} Min.`;
+  if(diff<1440) return `vor ${Math.floor(diff/60)} Std.`;
+  return `${d.getDate()}.${d.getMonth()+1}. ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+function setStatus(ok,text,lastSync){
   connected=ok;
   $('connDot').style.background=ok?'var(--green)':'var(--orange)';
   $('connDot').style.animation=ok?'blink 2s infinite':'none';
@@ -866,6 +1055,8 @@ function setStatus(ok,text){
   $('syncBtnLabel').textContent=ok?'Strava Sync':'Mit Strava verbinden';
   $('notice').style.display=ok?'none':'flex';
   if(!ok) $('noticeText').textContent='Noch keine Verbindung zu Strava. Verbinde dein Konto, um echte Touren zu laden.';
+  const ls=$('lastSyncText');
+  if(ls) ls.textContent=lastSync?`Sync: ${fmtSyncTime(lastSync)}`:'';
 }
 function connectOrSync(){ connected ? doSync() : connect() }
 async function connect(){ try{ const d=await api('/auth/url'); location.href=d.url }catch(e){ showToast(e.message,'error') } }
@@ -873,15 +1064,15 @@ async function connect(){ try{ const d=await api('/auth/url'); location.href=d.u
 async function checkStatus(){
   try{
     const d=await api('/auth/status');
-    setStatus(!!d.connected, d.connected?'Strava verbunden':'Strava nicht verbunden');
+    setStatus(!!d.connected, d.connected?'Strava verbunden':'Strava nicht verbunden', d.last_sync);
     if(d.connected){
-      await Promise.all([loadDashboard(), loadActivities(), loadHr(), loadBike()]);
+      await Promise.all([loadDashboard(), loadActivities(), loadHr(), loadBike(), loadWeeklyStats(), loadGoal()]);
     } else {
-      await loadActivities();
+      await Promise.all([loadActivities(), loadGoal()]);
     }
   }catch(e){
     setStatus(false,'Worker nicht erreichbar');
-    showToast(e.message,'error');
+    showToast('Worker nicht erreichbar – bitte Seite neu laden.','error');
   }
 }
 
@@ -891,7 +1082,13 @@ async function doSync(){
   try{
     const d=await api('/sync',{method:'POST'});
     showToast(d.message||'Sync abgeschlossen');
-    await Promise.all([loadDashboard(), loadActivities(), loadBike()]);
+    const ls=$('lastSyncText'); if(ls&&d.last_sync) ls.textContent=`Sync: ${fmtSyncTime(d.last_sync)}`;
+    // Wartungs-Erinnerung anzeigen
+    if(d.maintReminder){
+      const rb=$('maintReminderBox'), rt=$('maintReminderText');
+      if(rb&&rt){ rt.textContent=d.maintReminder; rb.style.display='flex'; }
+    }
+    await Promise.all([loadDashboard(), loadActivities(), loadBike(), loadWeeklyStats()]);
   }catch(e){ showToast(e.message,'error') }
   finally{ btn.disabled=false; $('syncBtnLabel').textContent='Strava Sync' }
 }
@@ -1057,9 +1254,11 @@ async function startAnalysis(stravaId){
 async function loadActivities(){
   const el=$('all-acts');
   try{
-    const d=await api('/activities?limit=50');
+    const d=await api('/activities?limit=200');
     activities=d.activities||[];
     $('actsCountLabel').textContent=`Alle Touren · ${activities.length} gesamt`;
+    const totalKm=activities.reduce((s,a)=>s+(a.distance_km||0),0);
+    if($('totalKmBadge')) $('totalKmBadge').textContent=`${Math.round(totalKm*10)/10} km gesamt`;
     if(!activities.length){
       el.innerHTML='<div style="padding:28px;text-align:center;color:var(--text3);font-size:13px">Noch keine Aktivitäten in D1. Verbinde Strava und starte einen Sync.</div>';
       return;
@@ -1070,6 +1269,24 @@ async function loadActivities(){
     el.innerHTML='<div style="padding:28px;text-align:center;color:var(--text3);font-size:13px">Aktivitäten konnten nicht geladen werden.</div>';
     if(connected) showToast(e.message,'error');
   }
+}
+
+function filterTours(){
+  const q=($('tourSearch')?.value||'').toLowerCase();
+  const minKm=parseFloat($('filterMinKm')?.value||'')||0;
+  const maxKm=parseFloat($('filterMaxKm')?.value||'')||Infinity;
+  const filtered=activities.filter(a=>{
+    const nameMatch=(a.name||'').toLowerCase().includes(q);
+    const kmMatch=(a.distance_km||0)>=minKm&&(a.distance_km||0)<=maxKm;
+    return nameMatch&&kmMatch;
+  });
+  const el=$('all-acts'); if(!el) return;
+  el.innerHTML='';
+  filtered.forEach(a=>el.appendChild(buildActRow(a)));
+  const totalKm=filtered.reduce((s,a)=>s+(a.distance_km||0),0);
+  if($('filterInfo')) $('filterInfo').textContent=filtered.length<activities.length?`${filtered.length} von ${activities.length} Touren`:'';
+  if($('totalKmBadge')) $('totalKmBadge').textContent=`${Math.round(totalKm*10)/10} km gesamt`;
+  $('actsCountLabel').textContent=filtered.length<activities.length?`Touren · ${filtered.length} gefiltert`:`Alle Touren · ${activities.length} gesamt`;
 }
 function buildActRow(a) {
   const d=document.createElement('div'); d.className='act-row'
