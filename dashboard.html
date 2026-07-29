@@ -664,19 +664,6 @@ Frag mich etwas oder probiere die Quick-Questions unten aus!</div>
         </button>
       </div>
     </div>
-
-    <!-- Manuelle km -->
-    <div style="margin-top:18px;padding-top:18px;border-top:1px solid var(--border);display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
-      <div style="flex:1;min-width:140px">
-        <label class="field-label">Manuelle km hinzufügen</label>
-        <input type="number" class="field" id="manBikeKm" placeholder="z.B. 8 km (Pendeln, Training)"/>
-      </div>
-      <div style="min-width:130px">
-        <label class="field-label">Datum</label>
-        <input type="date" class="field" id="manBikeDate" />
-      </div>
-      <button class="btn btn-primary" onclick="addManualKm()" style="padding:9px 16px">+ km hinzufügen</button>
-    </div>
   </div>
 
   <!-- Wartung Grid -->
@@ -801,13 +788,49 @@ function fmtDate(iso){ if(!iso) return '–'; const p=String(iso).slice(0,10).sp
 function formatTime(s){s=Number(s||0);const h=Math.floor(s/3600),m=Math.floor(s%3600/60);return h?`${h}h ${m}m`:`${m}m`}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 
+// ── Markdown-Renderer für Claude-Antworten (Analyse & Chat) ──
+function inlineMd(s){
+  s=esc(s)
+  s=s.replace(/\*\*(.+?)\*\*/g,'<strong style="color:var(--text);font-weight:700">$1</strong>')
+  s=s.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g,'$1<em>$2</em>')
+  return s
+}
+function renderMarkdown(md){
+  if(!md) return ''
+  const lines=String(md).split(/\r?\n/)
+  let html='', inList=false, listType=null, para=[]
+  const flushPara=()=>{ if(para.length){ html+=`<p style="margin:0 0 10px 0">${inlineMd(para.join(' '))}</p>`; para=[] } }
+  const closeList=()=>{ if(inList){ html+= listType==='ol'?'</ol>':'</ul>'; inList=false; listType=null } }
+  for(const raw of lines){
+    const line=raw.trim()
+    if(!line){ flushPara(); closeList(); continue }
+    let m
+    if((m=line.match(/^###\s+(.*)/))){ flushPara();closeList(); html+=`<h4 style="margin:14px 0 6px;color:var(--text);font-size:13px;font-weight:700">${inlineMd(m[1])}</h4>`; continue }
+    if((m=line.match(/^##\s+(.*)/))){ flushPara();closeList(); html+=`<h3 style="margin:16px 0 8px;color:var(--text);font-size:14.5px;font-weight:700">${inlineMd(m[1])}</h3>`; continue }
+    if((m=line.match(/^#\s+(.*)/))){ flushPara();closeList(); html+=`<h2 style="margin:16px 0 8px;color:var(--text);font-size:16px;font-weight:700">${inlineMd(m[1])}</h2>`; continue }
+    if((m=line.match(/^[-*→]\s+(.*)/))){
+      flushPara()
+      if(!inList||listType!=='ul'){ closeList(); html+='<ul style="margin:4px 0 10px;padding-left:20px">'; inList=true; listType='ul' }
+      html+=`<li style="margin-bottom:4px">${inlineMd(m[1])}</li>`; continue
+    }
+    if((m=line.match(/^\d+\.\s+(.*)/))){
+      flushPara()
+      if(!inList||listType!=='ol'){ closeList(); html+='<ol style="margin:4px 0 10px;padding-left:20px">'; inList=true; listType='ol' }
+      html+=`<li style="margin-bottom:4px">${inlineMd(m[1])}</li>`; continue
+    }
+    closeList(); para.push(line)
+  }
+  flushPara(); closeList()
+  return html
+}
+
 // ── Fixed maintenance / cleaning intervals (client-side, based on real bike km) ──
 const MAINT_DEF=[
-  {key:'Kette', interval:1500, color:'#f97316'},
-  {key:'Kassette', interval:5000, color:'#ef4444'},
-  {key:'Bremsbeläge', interval:3000, color:'#a855f7'},
-  {key:'Reifen', interval:5000, color:'#06b6d4'},
-  {key:'Großer Service', interval:10000, color:'#22c55e'},
+  {key:'Kette', interval:1500, color:'#f97316', match:['kette','chain']},
+  {key:'Kassette', interval:5000, color:'#ef4444', match:['kassette','ritzel','cassette']},
+  {key:'Bremsbeläge', interval:3000, color:'#a855f7', match:['brems','bremsbel']},
+  {key:'Reifen', interval:5000, color:'#06b6d4', match:['reifen','tire','tyre']},
+  {key:'Großer Service', interval:10000, color:'#22c55e', match:['service','inspektion']},
 ];
 const CLEAN_DEF=[
   {key:'wash', label:'Rad gewaschen', warnDays:7},
@@ -815,6 +838,14 @@ const CLEAN_DEF=[
   {key:'tyre', label:'Reifen geprüft', warnDays:14},
 ];
 function daysBetween(a,b){const A=new Date(a),B=new Date(b);return Math.round((B-A)/86400000)}
+
+/** Findet den letzten Wartungslog-Eintrag mit km-Angabe, der zu diesem Intervall passt
+ *  (z.B. "Kette gewechselt" für das Kette-Intervall) – das ist die neue Basislinie. */
+function findMaintBaseline(m){
+  const matches=maintLog.filter(x=>x.km_at_time!=null && m.match.some(kw=>(x.description||'').toLowerCase().includes(kw)))
+  if(!matches.length) return null
+  return matches.slice().sort((a,b)=>new Date(b.date)-new Date(a.date))[0]
+}
 
 // ── Tab switching ──────────────────────────
 function switchTab(id, btn) {
@@ -1017,7 +1048,7 @@ async function startAnalysis(stravaId){
   box.innerHTML='<span style="color:var(--text3)">Claude analysiert deine letzte Tour…</span>'
   try{
     const d=await api('/coach/analyze',{method:'POST',body:JSON.stringify({activity_id:stravaId,model:chatModel})});
-    box.style.color='var(--text2)'; box.textContent=d.analysis||'Keine Analyse erhalten.'
+    box.style.color='var(--text2)'; box.innerHTML=d.analysis?renderMarkdown(d.analysis):'Keine Analyse erhalten.'
   }catch(e){ box.innerHTML=`<span style="color:var(--red)">${esc(e.message)}</span>` }
   finally{ btn.disabled=false; btn.innerHTML=oldHtml }
 }
@@ -1073,8 +1104,8 @@ async function analyzeAct(id){
   cont.style.color='var(--text3)'; cont.textContent='Claude analysiert deine Tour…'
   try{
     const d=await api('/coach/analyze',{method:'POST',body:JSON.stringify({activity_id:id,model:chatModel})});
-    cont.style.color='var(--text2)'; cont.style.whiteSpace='pre-wrap'
-    cont.textContent=d.analysis||'Keine Analyse erhalten.'
+    cont.style.color='var(--text2)'
+    cont.innerHTML=d.analysis?renderMarkdown(d.analysis):'Keine Analyse erhalten.'
   }catch(e){
     cont.style.color='var(--red)'; cont.textContent=e.message
   }finally{
@@ -1099,8 +1130,9 @@ function addMsg(role,text){
   const avLabel=isUser?'F':'◈'
   const bubbleBorder=isUser?'var(--accent)':'var(--border2)'
   const br=isUser?'12px 4px 12px 12px':'4px 12px 12px 12px'
+  const bodyHtml = isUser ? esc(text) : renderMarkdown(text)
   div.innerHTML=`<div style="width:30px;height:30px;border-radius:6px;background:${avBg};border:1px solid ${isUser?'var(--border2)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;font-weight:700;color:#fff">${avLabel}</div>
-    <div style="max-width:80%;background:var(--surface2);border:1px solid ${bubbleBorder};border-radius:${br};padding:11px 14px;font-size:13px;line-height:1.75;color:var(--text2);white-space:pre-wrap">${esc(text)}</div>`
+    <div style="max-width:80%;background:var(--surface2);border:1px solid ${bubbleBorder};border-radius:${br};padding:11px 14px;font-size:13px;line-height:1.75;color:var(--text2);${isUser?'white-space:pre-wrap':''}">${bodyHtml}</div>`
   wrap.appendChild(div); wrap.scrollTop=wrap.scrollHeight
 }
 function addTyping(){
@@ -1218,10 +1250,13 @@ async function loadBike(){
       $('activeBikeKm').textContent=`${kmTotal.toLocaleString('de-DE')} km gesamt`;
       $('modalOldBike').textContent=activeBikeData.name;
 
-      // next maintenance = smallest remaining interval
+      // next maintenance = smallest remaining interval (Basislinie berücksichtigt)
       let best=null;
       MAINT_DEF.forEach(m=>{
-        const rem=m.interval-kmTotal;
+        const last=findMaintBaseline(m)
+        const baseline=last?Number(last.km_at_time):0
+        const since=Math.max(0,kmTotal-baseline)
+        const rem=m.interval-since;
         if(best===null||rem<best.rem) best={rem,label:m.key,interval:m.interval};
       });
       if(best){
@@ -1246,8 +1281,11 @@ function renderMaint() {
   const kmTotal=Number(activeBikeData?.km_total||0);
   el.innerHTML=''
   MAINT_DEF.forEach(m=>{
-    const pct=Math.min(100,Math.round(kmTotal/m.interval*100))
-    const rem=Math.round((m.interval-kmTotal)*10)/10
+    const last=findMaintBaseline(m)
+    const baseline=last?Number(last.km_at_time):0
+    const since=Math.max(0,kmTotal-baseline)
+    const pct=Math.min(100,Math.round(since/m.interval*100))
+    const rem=Math.round((m.interval-since)*10)/10
     const warn=pct>80
     const d=document.createElement('div'); d.className='maint-row'
     d.innerHTML=`
@@ -1256,7 +1294,7 @@ function renderMaint() {
         <div style="font-size:11px;font-weight:700;color:${warn?'var(--red)':'var(--text3)'}">${rem>0?`${rem.toLocaleString('de-DE')} km verbleibend`:'Fällig!'}</div>
       </div>
       <div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${warn?'var(--red)':m.color}"></div></div>
-      <div style="font-size:10px;color:var(--text3);margin-top:5px;font-weight:600">${kmTotal.toLocaleString('de-DE')} / ${m.interval.toLocaleString('de-DE')} km · ${pct}%</div>`
+      <div style="font-size:10px;color:var(--text3);margin-top:5px;font-weight:600">${since.toLocaleString('de-DE')} / ${m.interval.toLocaleString('de-DE')} km · ${pct}%${last?` · zuletzt ${fmtDate(last.date)} bei ${baseline.toLocaleString('de-DE')} km`:''}</div>`
     el.appendChild(d)
   })
 }
@@ -1355,17 +1393,6 @@ async function saveLog(){
   }catch(e){ showToast(e.message,'error') }
 }
 
-async function addManualKm(){
-  try{
-    const km=Number(document.getElementById('manBikeKm').value);
-    if(!km||km<0){ showToast('km eingeben','error'); return }
-    await api('/bike/km',{method:'POST',body:JSON.stringify({km,date:dateToday()})});
-    showToast(`${km} km hinzugefügt`);
-    document.getElementById('manBikeKm').value='';
-    loadBike();
-  }catch(e){ showToast(e.message,'error') }
-}
-
 function renderArchive() {
   const el=document.getElementById('bikeArchive'); if(!el) return
   const cnt=document.getElementById('archiveCount')
@@ -1438,7 +1465,6 @@ function showToast(msg,type='ok'){
 
 // ── Init ───────────────────────────────────
 document.getElementById('hrDate') && (document.getElementById('hrDate').value=dateToday());
-document.getElementById('manBikeDate') && (document.getElementById('manBikeDate').value=dateToday());
 document.getElementById('logDate') && (document.getElementById('logDate').value=dateToday());
 
 window.addEventListener('resize',()=>{drawLoadChart();drawHrChart(null)})
