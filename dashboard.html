@@ -302,7 +302,7 @@
     }
 
     /* ── HEATMAP ── */
-    .heatmap-cell{
+    .heatmap-cell-REMOVED{
       width:30px;height:30px;border-radius:5px;
       cursor:default;flex-shrink:0;transition:transform .15s;
     }
@@ -432,34 +432,13 @@
     </div>
   </div>
 
-  <!-- HEATMAP + STREAK + ZIEL -->
-  <div style="display:grid;grid-template-columns:1fr 220px;gap:16px">
-    <!-- Heatmap -->
-    <div class="card">
-      <div class="card-label">Trainingsaktivität · 12 Wochen</div>
-      <div id="heatmapGrid"></div>
-      <div id="heatmapLegend" style="display:flex;align-items:center;gap:5px;margin-top:10px;font-size:10px;color:var(--text3)">
-        Weniger
-        <span style="width:10px;height:10px;border-radius:2px;background:var(--border);display:inline-block"></span>
-        <span style="width:10px;height:10px;border-radius:2px;background:rgba(59,130,246,.2);display:inline-block"></span>
-        <span style="width:10px;height:10px;border-radius:2px;background:rgba(59,130,246,.5);display:inline-block"></span>
-        <span style="width:10px;height:10px;border-radius:2px;background:var(--accent);display:inline-block"></span>
-        Mehr
-      </div>
-    </div>
-    <!-- Streak + Ziel -->
-    <div style="display:flex;flex-direction:column;gap:12px">
-      <div class="stat-card" style="--c:var(--orange)">
-        <div class="stat-label">Aktive Wochen 🔥</div>
-        <div><span class="stat-value" id="streakVal">–</span><span class="stat-unit">Wochen</span></div>
-        <div class="stat-sub">in Folge trainiert</div>
-      </div>
-      <div class="card" style="border-top:2px solid var(--purple);flex:1">
-        <div class="section-label" style="margin-bottom:8px">Mein Ziel</div>
-        <div class="goal-display" id="goalDisplay">Kein Ziel gesetzt</div>
-        <input type="text" class="field" id="goalInput" placeholder="z.B. Ötztaler 24. Aug, 238 km" style="margin-bottom:8px"/>
-        <button class="btn btn-primary" onclick="saveGoal()" style="width:100%;justify-content:center;padding:8px;font-size:12px">Ziel speichern</button>
-      </div>
+  <!-- ZIEL -->
+  <div class="card" style="border-top:2px solid var(--purple)">
+    <div class="section-label" style="margin-bottom:8px">Mein Ziel</div>
+    <div class="goal-display" id="goalDisplay">Kein Ziel gesetzt</div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <input type="text" class="field" id="goalInput" placeholder="z.B. Ötztaler 24. Aug, 238 km" style="flex:1;margin-bottom:0"/>
+      <button class="btn btn-primary" onclick="saveGoal()" style="white-space:nowrap;padding:8px 14px;font-size:12px">Ziel speichern</button>
     </div>
   </div>
 
@@ -944,43 +923,6 @@ function findMaintBaseline(m){
 }
 
 // ── Weekly Stats / Heatmap ─────────────────
-async function loadWeeklyStats(){
-  try{
-    const d=await api('/stats/weekly');
-    $('streakVal').textContent=d.streak||0;
-    drawHeatmap(d.weeks||[]);
-  }catch(e){ /* silent */ }
-}
-
-function drawHeatmap(weeks){
-  const el=$('heatmapGrid'); if(!el) return;
-  el.innerHTML='';
-  const maxKm=Math.max(...weeks.map(w=>w.km),1);
-  const row=document.createElement('div'); row.className='heatmap-row';
-  // Fülle auf 12 Wochen auf
-  const padded=[...Array(Math.max(0,12-weeks.length)).fill(null), ...weeks];
-  padded.forEach(w=>{
-    const cell=document.createElement('div'); cell.className='heatmap-cell';
-    if(!w||!w.km){
-      cell.style.background='var(--border)'; cell.style.opacity='.4';
-    } else {
-      const pct=w.km/maxKm;
-      cell.style.background=pct<0.25?'rgba(59,130,246,.2)':pct<0.5?'rgba(59,130,246,.4)':pct<0.75?'rgba(59,130,246,.65)':'var(--accent)';
-      const d=new Date(w.week_start);
-      cell.title=`KW ${d.getDate()}.${d.getMonth()+1}.: ${w.km} km · ${w.tss} TSS · ${w.rides} Tour${w.rides!==1?'en':''}`;
-    }
-    row.appendChild(cell);
-  });
-  el.appendChild(row);
-  // Wochen-Labels
-  const lblRow=document.createElement('div'); lblRow.style.cssText='display:flex;gap:5px;margin-top:4px';
-  padded.forEach(w=>{
-    const lbl=document.createElement('div'); lbl.style.cssText='width:30px;font-size:9px;color:var(--text3);text-align:center;flex-shrink:0';
-    if(w){const d=new Date(w.week_start);lbl.textContent=`${d.getDate()}.${d.getMonth()+1}.`}
-    lblRow.appendChild(lbl);
-  });
-  el.appendChild(lblRow);
-}
 
 // ── Ziel ───────────────────────────────────
 async function loadGoal(){
@@ -1012,7 +954,7 @@ function switchTab(id, btn) {
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'))
   document.getElementById('tab-'+id).style.display=''
   btn.classList.add('active')
-  if(id==='dashboard') setTimeout(()=>{drawLoadChart(); drawHeatmap([]);},50)
+  if(id==='dashboard') setTimeout(()=>{drawLoadChart();},50)
   if(id==='health') setTimeout(()=>{drawHrChart();},50)
 }
 
@@ -1045,7 +987,7 @@ async function checkStatus(){
     const d=await api('/auth/status');
     setStatus(!!d.connected, d.connected?'Strava verbunden':'Strava nicht verbunden', d.last_sync);
     if(d.connected){
-      await Promise.all([loadDashboard(), loadActivities(), loadHr(), loadBike(), loadWeeklyStats(), loadGoal()]);
+      await Promise.all([loadDashboard(), loadActivities(), loadHr(), loadBike(), loadGoal()]);
     } else {
       await Promise.all([loadActivities(), loadGoal()]);
     }
@@ -1067,7 +1009,7 @@ async function doSync(){
       const rb=$('maintReminderBox'), rt=$('maintReminderText');
       if(rb&&rt){ rt.textContent=d.maintReminder; rb.style.display='flex'; }
     }
-    await Promise.all([loadDashboard(), loadActivities(), loadBike(), loadWeeklyStats()]);
+    await Promise.all([loadDashboard(), loadActivities(), loadBike()]);
   }catch(e){ showToast(e.message,'error') }
   finally{ btn.disabled=false; $('syncBtnLabel').textContent='Strava Sync' }
 }
