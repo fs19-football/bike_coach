@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Trainings-Dashboard · KI-Radcoach</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- App-Icon für iPhone/iPad Homescreen -->
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -20,24 +20,24 @@
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
     :root{
-      --bg:        #f0f3f8;
+      --bg:        #f8f7f4;
       --surface:   #ffffff;
-      --surface2:  #f5f7fc;
-      --border:    #dde2ef;
-      --border2:   #c8d0e4;
-      --text:      #111827;
-      --text2:     #374151;
-      --text3:     #6b7280;
-      --accent:    #2563eb;
-      --accent2:   #1d55d4;
-      --green:     #16a34a;
-      --orange:    #ea6c00;
-      --red:       #dc2626;
-      --purple:    #7c3aed;
-      --cyan:      #0891b2;
+      --surface2:  #f2f0ec;
+      --border:    #e4e0d8;
+      --border2:   #ccc9c0;
+      --text:      #111111;
+      --text2:     #333333;
+      --text3:     #888888;
+      --accent:    #111111;
+      --accent2:   #333333;
+      --green:     #2d7a3a;
+      --orange:    #b85c00;
+      --red:       #b91c1c;
+      --purple:    #5b21b6;
+      --cyan:      #0e7490;
     }
 
-    body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+    body{font-family:'Space Grotesk',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
     ::-webkit-scrollbar{width:4px}
     ::-webkit-scrollbar-track{background:var(--bg)}
     ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
@@ -60,52 +60,59 @@
     }
     .topbar{
       max-width:1280px;margin:0 auto;
-      padding:0 28px;height:60px;
+      padding:0 32px;height:64px;
       display:flex;align-items:center;justify-content:space-between;gap:16px;
     }
-    .logo{display:flex;align-items:center;gap:10px}
+    .logo{display:flex;align-items:center;gap:12px}
     .logo-icon{
-      width:34px;height:34px;border-radius:8px;
+      width:32px;height:32px;border-radius:50%;
       overflow:hidden;flex-shrink:0;
     }
-    .logo-icon img{width:34px;height:34px;display:block;object-fit:cover;border-radius:8px}
+    .logo-icon img{width:32px;height:32px;display:block;object-fit:cover;border-radius:50%}
     .logo-title{
-      font-family:'Barlow Condensed',sans-serif;
-      font-size:18px;font-weight:700;letter-spacing:.5px;
-      color:var(--text);text-transform:uppercase;
+      font-family:'Space Grotesk',system-ui,sans-serif;
+      font-size:17px;font-weight:700;letter-spacing:-.2px;
+      color:var(--text);
     }
-    .logo-sub{font-size:10px;color:var(--text3);font-weight:500;letter-spacing:.08em;text-transform:uppercase;margin-top:1px}
+    .logo-sub{font-size:10px;color:var(--text3);font-weight:400;letter-spacing:.06em;text-transform:uppercase;margin-top:1px}
     .connection-pill{
       display:flex;align-items:center;gap:6px;
-      background:var(--surface2);border:1px solid var(--border2);
-      border-radius:20px;padding:5px 12px;
-      font-size:11px;font-weight:600;color:var(--green);
+      background:transparent;border:1px solid var(--border2);
+      border-radius:999px;padding:5px 14px;
+      font-size:11px;font-weight:500;color:var(--text3);
       letter-spacing:.03em;
     }
-    .live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s infinite}
+    .connection-pill.ok{color:var(--green);border-color:rgba(45,122,58,.3)}
+    .live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 2s infinite}
 
     /* ── NAV TABS ── */
     .nav-wrap{background:var(--surface);border-bottom:1px solid var(--border)}
-    nav{max-width:1280px;margin:0 auto;padding:0 28px;display:flex;gap:0}
+    nav{max-width:1280px;margin:0 auto;padding:0 32px;display:flex;gap:0}
     .tab-btn{
-      background:none;border:none;border-bottom:2px solid transparent;
-      color:var(--text3);padding:12px 18px;cursor:pointer;
-      font-family:'Inter',sans-serif;font-size:12px;font-weight:600;
-      letter-spacing:.04em;text-transform:uppercase;
+      background:none;border:none;border-bottom:1.5px solid transparent;
+      color:var(--text3);padding:13px 20px;cursor:pointer;
+      font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:500;
+      letter-spacing:.06em;text-transform:uppercase;
       transition:all .18s;display:flex;align-items:center;gap:7px;
       white-space:nowrap;
     }
-    .tab-btn .ti{font-size:14px}
-    .tab-btn:hover:not(.active){color:var(--text2);border-bottom-color:var(--border2)}
-    .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:700}
+    .tab-btn .ti{font-size:13px}
+    .tab-btn:hover:not(.active){color:var(--text2)}
+    .tab-btn.active{color:var(--text);border-bottom-color:var(--text);font-weight:700}
 
     /* ── MAIN ── */
-    main{max-width:1280px;margin:0 auto;padding:28px;display:flex;flex-direction:column;gap:24px}
+    main{max-width:1280px;margin:0 auto;padding:36px 32px;display:flex;flex-direction:column;gap:28px}
+
+    /* ── SECTION LABEL ── */
+    .section-label{
+      font-size:10px;font-weight:700;color:var(--text3);
+      text-transform:uppercase;letter-spacing:.12em;margin-bottom:14px;
+    }
 
     /* ── CARDS ── */
     .card{
-      background:var(--surface);border:1px solid var(--border);border-radius:12px;
-      padding:22px;
+      background:var(--surface);border:1px solid var(--border);border-radius:4px;
+      padding:24px;
     }
     .card-label{
       font-size:10px;font-weight:700;color:var(--text3);
@@ -115,240 +122,329 @@
     .card-label::after{content:'';flex:1;height:1px;background:var(--border)}
 
     /* ── STAT CARDS ── */
-    .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:4px;overflow:hidden}
     .stat-card{
-      background:var(--surface);border:1px solid var(--border);border-radius:12px;
-      padding:18px 20px;position:relative;overflow:hidden;
-      transition:border-color .2s;cursor:default;
+      background:var(--surface);
+      padding:24px 22px;position:relative;overflow:hidden;
+      transition:background .2s;cursor:default;
     }
     .stat-card::before{
-      content:'';position:absolute;top:0;left:0;right:0;height:2px;
-      background:var(--c,var(--accent));
+      content:'';position:absolute;top:0;left:0;right:0;height:1.5px;
+      background:var(--c,var(--text));opacity:.15;
     }
-    .stat-card:hover{border-color:var(--border2)}
-    .stat-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
-    .stat-value{font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:700;color:var(--c,var(--accent));letter-spacing:-.5px;line-height:1}
-    .stat-unit{font-size:13px;font-weight:500;color:var(--text3);margin-left:4px}
-    .stat-sub{font-size:11px;color:var(--text3);margin-top:6px}
+    .stat-card:hover{background:var(--surface2)}
+    .stat-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px}
+    .stat-value{font-family:'Space Grotesk',system-ui,sans-serif;font-size:40px;font-weight:700;color:var(--text);letter-spacing:-.5px;line-height:1}
+    .stat-unit{font-size:13px;font-weight:400;color:var(--text3);margin-left:3px}
+    .stat-sub{font-size:11px;color:var(--text3);margin-top:8px;font-weight:400}
 
     /* ── BUTTONS ── */
     .btn{
       display:inline-flex;align-items:center;gap:7px;
-      border:none;border-radius:8px;cursor:pointer;
-      font-family:'Inter',sans-serif;font-weight:700;
+      border:none;border-radius:999px;cursor:pointer;
+      font-family:'Space Grotesk',sans-serif;font-weight:600;
       transition:all .15s;white-space:nowrap;
     }
-    .btn:disabled{opacity:.4;cursor:not-allowed}
+    .btn:disabled{opacity:.35;cursor:not-allowed}
     .btn-primary{
-      background:var(--accent);color:#fff;
-      padding:8px 16px;font-size:12px;letter-spacing:.02em;
-      box-shadow:0 0 20px rgba(59,130,246,.2);
+      background:var(--text);color:#fff;
+      padding:9px 20px;font-size:12px;letter-spacing:.02em;
     }
-    .btn-primary:hover:not(:disabled){background:var(--accent2);box-shadow:0 0 24px rgba(59,130,246,.35)}
+    .btn-primary:hover:not(:disabled){background:var(--text2)}
     .btn-danger{
-      background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;
-      padding:8px 18px;font-size:13px;font-weight:800;letter-spacing:.03em;
-      box-shadow:0 0 20px rgba(249,115,22,.2);
+      background:var(--text);color:#fff;
+      padding:9px 20px;font-size:12px;font-weight:700;letter-spacing:.03em;
     }
-    .btn-danger:hover:not(:disabled){box-shadow:0 0 28px rgba(249,115,22,.4)}
+    .btn-danger:hover:not(:disabled){background:var(--text2)}
     .btn-ghost{
       background:transparent;border:1px solid var(--border2);color:var(--text2);
-      padding:7px 14px;font-size:12px;
+      padding:8px 16px;font-size:12px;border-radius:999px;
     }
-    .btn-ghost:hover{border-color:var(--accent);color:var(--accent);background:rgba(59,130,246,.06)}
+    .btn-ghost:hover{border-color:var(--text);color:var(--text)}
     .btn-green{
-      background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);
-      color:var(--green);padding:6px 12px;font-size:11px;font-weight:700;
+      background:transparent;border:1px solid rgba(45,122,58,.35);
+      color:var(--green);padding:6px 14px;font-size:11px;font-weight:600;border-radius:999px;
     }
-    .btn-green:hover{background:rgba(34,197,94,.2)}
+    .btn-green:hover{background:rgba(45,122,58,.08)}
 
     /* ── CHART AREA ── */
     .chart-card{display:flex;flex-direction:column;min-height:300px}
     .chart-toggles{display:flex;gap:6px;flex-wrap:wrap}
     .ctoggle{
       display:flex;align-items:center;gap:5px;
-      padding:4px 11px;border-radius:4px;border:1px solid var(--border2);
-      background:transparent;color:var(--text3);font-family:'Inter',sans-serif;
-      font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;
+      padding:4px 12px;border-radius:999px;border:1px solid var(--border2);
+      background:transparent;color:var(--text3);font-family:'Space Grotesk',sans-serif;
+      font-size:11px;font-weight:500;cursor:pointer;transition:all .15s;
       letter-spacing:.02em;
     }
-    .ctoggle .dot{width:6px;height:6px;border-radius:50%;background:var(--tc,var(--accent))}
-    .ctoggle.on{background:color-mix(in srgb,var(--tc) 12%,transparent);border-color:color-mix(in srgb,var(--tc) 40%,transparent);color:var(--text)}
-    .ctoggle:not(.on){opacity:.5}
+    .ctoggle .dot{width:6px;height:6px;border-radius:50%;background:var(--tc,var(--text))}
+    .ctoggle.on{background:color-mix(in srgb,var(--tc) 10%,transparent);border-color:color-mix(in srgb,var(--tc) 35%,transparent);color:var(--text)}
+    .ctoggle:not(.on){opacity:.45}
     .chart-area{flex:1;position:relative;min-height:220px;margin-top:16px}
     .chart-area canvas{position:absolute;inset:0;width:100%;height:100%}
     .chart-legend{font-size:10px;color:var(--text3);margin-top:10px;letter-spacing:.04em}
 
     /* ── FORM WIDGET ── */
     .form-big{
-      font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:700;
+      font-family:'Space Grotesk',system-ui,sans-serif;font-size:52px;font-weight:700;
       line-height:1;letter-spacing:-1px;
     }
     .metric-pill{
-      background:var(--surface2);border:1px solid var(--border2);border-radius:8px;
+      background:var(--surface2);border:1px solid var(--border);border-radius:4px;
       padding:12px 14px;
     }
-    .metric-val{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;letter-spacing:-.5px}
+    .metric-val{font-family:'Space Grotesk',system-ui,sans-serif;font-size:26px;font-weight:700;letter-spacing:-.5px}
 
     /* ── KI ANALYSE ── */
     .analysis-box{
-      background:var(--surface2);border:1px solid var(--border);border-radius:10px;
-      padding:18px;font-size:13px;line-height:1.85;color:var(--text2);
+      background:var(--surface2);border:1px solid var(--border);border-radius:4px;
+      padding:20px;font-size:13px;line-height:1.9;color:var(--text2);
       white-space:pre-wrap;min-height:130px;
     }
     .tour-stat{
       background:var(--surface2);border:1px solid var(--border);
-      border-radius:10px;padding:14px;text-align:center;
+      border-radius:4px;padding:16px;text-align:center;
     }
-    .tour-stat-val{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;letter-spacing:-.5px}
-    .tour-stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;font-weight:600;margin-bottom:5px}
-    .tour-stat-unit{font-size:11px;color:var(--text3);margin-top:2px}
+    .tour-stat-val{font-family:'Space Grotesk',system-ui,sans-serif;font-size:26px;font-weight:700;letter-spacing:-.5px}
+    .tour-stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:6px}
+    .tour-stat-unit{font-size:11px;color:var(--text3);margin-top:3px}
 
     /* ── ACTIVITIES ── */
     .act-row{
-      background:var(--surface);border:1px solid var(--border);border-radius:10px;
-      overflow:hidden;margin-bottom:8px;transition:border-color .2s;
+      background:var(--surface);border:1px solid var(--border);border-radius:4px;
+      overflow:hidden;margin-bottom:6px;transition:border-color .2s;
     }
     .act-row:hover{border-color:var(--border2)}
     .act-header{
-      padding:14px 18px;cursor:pointer;
+      padding:14px 20px;cursor:pointer;
       display:grid;align-items:center;gap:12px;
       grid-template-columns:1fr repeat(4,90px) 120px 24px;
     }
-    .act-body{border-top:2px solid var(--border2);padding:16px 18px;background:var(--surface2)}
-    .act-name{font-weight:700;font-size:14px;color:var(--text);margin-bottom:2px}
-    .act-date{font-size:11px;color:var(--text3);font-weight:500}
-    .act-metric{font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px}
+    .act-body{border-top:1px solid var(--border);padding:18px 20px;background:var(--surface2)}
+    .act-name{font-weight:600;font-size:14px;color:var(--text);margin-bottom:2px}
+    .act-date{font-size:11px;color:var(--text3);font-weight:400}
+    .act-metric{font-size:13px;font-weight:600;display:flex;align-items:center;gap:5px}
 
     /* ── CHAT ── */
     .chat-wrap{
-      background:var(--surface);border:1px solid var(--border);border-radius:12px;
+      background:var(--surface);border:1px solid var(--border);border-radius:4px;
       display:flex;flex-direction:column;height:640px;overflow:hidden;
     }
-    .chat-header{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-    .chat-msgs{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:14px}
-    .chat-footer{border-top:1px solid var(--border);padding:12px 16px;display:flex;gap:10px;align-items:center}
+    .chat-header{padding:16px 22px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+    .chat-msgs{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+    .chat-footer{border-top:1px solid var(--border);padding:14px 18px;display:flex;gap:10px;align-items:center}
     .chat-input{
-      flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;
-      padding:10px 14px;color:var(--text);font-size:13px;font-family:'Inter',sans-serif;outline:none;
+      flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:999px;
+      padding:10px 18px;color:var(--text);font-size:13px;font-family:'Space Grotesk',sans-serif;outline:none;
       transition:border-color .15s;
     }
-    .chat-input:focus{border-color:var(--accent)}
+    .chat-input:focus{border-color:var(--text)}
     .chat-input::placeholder{color:var(--text3)}
-    .quick-row{padding:8px 16px;border-top:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap}
+    .quick-row{padding:10px 18px;border-top:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap}
     .quick-btn{
-      background:var(--surface2);border:1px solid var(--border2);border-radius:4px;
-      padding:4px 10px;color:var(--text2);font-size:11px;font-weight:600;
-      cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;
+      background:var(--surface2);border:1px solid var(--border2);border-radius:999px;
+      padding:4px 12px;color:var(--text2);font-size:11px;font-weight:500;
+      cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .15s;
       letter-spacing:.02em;
     }
-    .quick-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(59,130,246,.06)}
+    .quick-btn:hover{border-color:var(--text);color:var(--text)}
     .model-toggle{
       display:flex;background:var(--surface2);border:1px solid var(--border2);
-      border-radius:6px;overflow:hidden;
+      border-radius:999px;overflow:hidden;
     }
     .model-btn{
       background:none;border:none;color:var(--text3);
-      padding:5px 12px;cursor:pointer;font-size:11px;font-weight:700;
-      font-family:'Inter',sans-serif;transition:all .15s;
+      padding:5px 14px;cursor:pointer;font-size:11px;font-weight:600;
+      font-family:'Space Grotesk',sans-serif;transition:all .15s;
     }
-    .model-btn.active{background:var(--accent);color:#fff}
+    .model-btn.active{background:var(--text);color:#fff;border-radius:999px}
+
+    /* ── CHAT BUBBLES ── */
+    .msg-user{align-self:flex-end;background:var(--text);color:#fff;border-radius:18px 18px 4px 18px;padding:10px 16px;max-width:75%;font-size:13px;line-height:1.6}
+    .msg-ai{align-self:flex-start;background:var(--surface2);border:1px solid var(--border);border-radius:4px 18px 18px 18px;padding:14px 18px;max-width:80%;font-size:13px;line-height:1.8;color:var(--text2)}
+    .msg-ai h1,.msg-ai h2,.msg-ai h3{font-family:'Space Grotesk',system-ui,sans-serif;color:var(--text);margin:12px 0 6px}
+    .msg-ai h2{font-size:17px}.msg-ai h3{font-size:14px}
+    .msg-ai p{margin:8px 0}
+    .msg-ai ul{margin:8px 0 10px 20px}
+    .msg-ai li{margin:5px 0}
+    .msg-ai strong{color:var(--text);font-weight:700}
+    .msg-ai code{background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:3px;font-size:12px}
+    .msg-ai hr{border:0;border-top:1px solid var(--border);margin:12px 0}
+    .msg-ai blockquote{margin:10px 0;padding:10px 14px;border-left:2px solid var(--border2);color:var(--text3)}
 
     /* ── INPUT ── */
-    .field-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px}
+    .field-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px}
     .field{
-      width:100%;background:var(--surface2);border:1px solid var(--border2);
-      border-radius:8px;padding:9px 12px;color:var(--text);
-      font-size:13px;font-family:'Inter',sans-serif;outline:none;
+      width:100%;background:var(--surface);border:1px solid var(--border2);
+      border-radius:4px;padding:9px 12px;color:var(--text);
+      font-size:13px;font-family:'Space Grotesk',sans-serif;outline:none;
       transition:border-color .15s;
     }
-    .field:focus{border-color:var(--accent)}
+    .field:focus{border-color:var(--text)}
     .field::placeholder{color:var(--text3)}
     select.field option{background:var(--surface);color:var(--text)}
 
     /* ── PROGRESS BAR ── */
-    .prog-track{width:100%;height:4px;background:var(--border2);border-radius:2px;overflow:hidden;margin-top:8px}
-    .prog-fill{height:100%;border-radius:2px;animation:barGrow .8s ease}
+    .prog-track{width:100%;height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-top:10px}
+    .prog-fill{height:100%;border-radius:1px;animation:barGrow .8s ease}
 
     /* ── HEALTH ── */
     .hr-table{width:100%;border-collapse:collapse;font-size:13px}
     .hr-table th{
-      text-align:left;color:var(--text);font-weight:800;padding:11px 14px;
-      border-bottom:2px solid var(--border2);font-size:11px;
-      text-transform:uppercase;letter-spacing:.08em;
+      text-align:left;color:var(--text);font-weight:700;padding:11px 14px;
+      border-bottom:1px solid var(--border);font-size:10px;
+      text-transform:uppercase;letter-spacing:.1em;
       background:var(--surface2);
     }
-    .hr-table th:first-child{border-radius:8px 0 0 0}
-    .hr-table th:last-child{border-radius:0 8px 0 0}
+    .hr-table th:first-child{border-radius:0}
     .hr-table td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text2)}
     .hr-table tr:last-child td{border-bottom:none}
     .hr-table tr:hover td{background:var(--surface2)}
     .badge{
       display:inline-flex;align-items:center;gap:4px;
-      padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;
+      padding:2px 9px;border-radius:999px;font-size:11px;font-weight:600;
     }
 
     /* ── BIKE ── */
     .bike-header-card{
-      background:linear-gradient(135deg,var(--surface) 60%,rgba(59,130,246,.06));
-      border:1px solid var(--border);border-radius:12px;padding:24px;
+      background:var(--surface);
+      border:1px solid var(--border);border-radius:4px;padding:28px;
     }
-    .maint-row{padding:14px 0;border-bottom:1px solid var(--border)}
+    .maint-row{padding:16px 0;border-bottom:1px solid var(--border)}
     .maint-row:last-child{border-bottom:none}
     .archive-card{
-      background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+      background:var(--surface2);border:1px solid var(--border);border-radius:4px;
       padding:16px;display:flex;align-items:center;gap:14px;
-      margin-bottom:8px;opacity:.65;
-    }
-
-    /* ── HEATMAP ── */
-    .heatmap-cell-REMOVED{
-      width:30px;height:30px;border-radius:5px;
-      cursor:default;flex-shrink:0;transition:transform .15s;
-    }
-    .heatmap-cell:hover{transform:scale(1.2)}
-    .heatmap-row{display:flex;gap:5px;align-items:center}
-    .heatmap-label{font-size:10px;color:var(--text3);width:28px;text-align:right;flex-shrink:0}
-
-    /* ── GOAL CARD ── */
-    .goal-display{
-      font-size:13px;color:var(--text);font-weight:600;
-      padding:10px 12px;background:var(--surface2);border:1px solid var(--border2);
-      border-radius:8px;margin-bottom:10px;line-height:1.5;min-height:38px;
-    }
-
-    /* ── FILTER BAR ── */
-    .filter-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
-    .filter-bar .field{padding:7px 10px}
-
-    /* ── MISC ── */
-    .demo-bar{
-      background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);
-      border-radius:8px;padding:10px 16px;
-      display:flex;align-items:center;gap:10px;font-size:12px;color:#93c5fd;
-      font-weight:500;
-    }
-    .section-label{
-      font-size:10px;font-weight:700;color:var(--text3);
-      text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;
-    }
-    .toast-msg{
-      position:fixed;bottom:24px;right:24px;z-index:999;border-radius:8px;
-      padding:11px 18px;font-size:13px;font-weight:700;max-width:340px;
-      box-shadow:0 8px 32px rgba(0,0,0,.4);animation:toast .25s ease;
-      display:flex;align-items:center;gap:8px;
+      margin-bottom:6px;opacity:.7;
     }
 
     /* ── MODAL ── */
     .modal-bg{
-      position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;
-      display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);
+      position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;
+      display:flex;align-items:center;justify-content:center;
+      animation:fadeUp .2s ease;
     }
     .modal{
-      background:var(--surface);border:1px solid var(--border2);
-      border-radius:14px;padding:28px;width:460px;max-width:92vw;
-      box-shadow:0 24px 60px rgba(0,0,0,.5);animation:fadeUp .2s ease;
+      background:var(--surface);border:1px solid var(--border);border-radius:4px;
+      padding:32px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;
+      animation:fadeUp .2s ease;
     }
+
+    /* ── NOTICE / DEMO BAR ── */
+    .demo-bar{
+      display:flex;align-items:center;gap:10px;
+      background:var(--surface2);border:1px solid var(--border);
+      border-radius:4px;padding:12px 18px;font-size:12px;color:var(--text2);
+    }
+
+    /* ── FILTER BAR ── */
+    .filter-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+
+    /* ── GOAL ── */
+    .goal-display{
+      font-family:'Space Grotesk',system-ui,sans-serif;
+      font-size:20px;font-weight:700;color:var(--text);margin-bottom:12px;line-height:1.4;
+    }
+
+    /* ── TOAST ── */
+    .toast-msg{
+      position:fixed;right:24px;bottom:24px;
+      background:var(--text);color:#fff;
+      padding:12px 18px;border-radius:999px;
+      font-size:12px;font-weight:600;letter-spacing:.02em;
+      animation:toast .25s ease;z-index:300;
+    }
+    .toast-msg.error{background:var(--red)}
+
+    /* ── HEATMAP ── */
+    .heatmap-row{display:flex;gap:5px;align-items:center}
+    .heatmap-label{font-size:10px;color:var(--text3);width:28px;text-align:right;flex-shrink:0}
+    .heatmap-grid{display:flex;gap:3px}
+    .heatmap-cell{
+      width:14px;height:14px;border-radius:2px;flex-shrink:0;
+    }
+
+    /* ── MAINT REMINDER ── */
+    #maintReminderBox{display:none;align-items:center;gap:10px;background:rgba(184,92,0,.07);border:1px solid rgba(184,92,0,.25);border-radius:4px;padding:12px 16px;font-size:12px;color:var(--orange);margin-bottom:16px}
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:900px){
+      main{padding:24px 16px;gap:18px}
+      .topbar{padding:0 16px}
+      nav{padding:0 12px}
+      .stat-grid{grid-template-columns:1fr 1fr;gap:1px}
+      .act-header{grid-template-columns:1fr 80px 80px 80px 80px;gap:8px}
+      .act-header > *:nth-child(6),.act-header > *:nth-child(7){display:none}
+    }
+    @media(max-width:600px){
+      .stat-grid{grid-template-columns:1fr 1fr}
+      .logo-sub,.connection-pill > div > div:last-child{display:none}
+    }
+
+    /* ══════════════════════════════════════
+       FUEL CALCULATOR
+    ══════════════════════════════════════ */
+    .duration-display{font-family:'Space Grotesk',system-ui,sans-serif;font-size:clamp(40px,6vw,58px);font-weight:700;line-height:1;margin-bottom:22px;letter-spacing:-1px}
+    .duration-display span{font-size:50%;color:var(--text3);font-weight:400}
+    input[type="range"]{-webkit-appearance:none;width:100%;height:2px;background:var(--border2);border-radius:1px;outline:none;cursor:pointer}
+    input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.2);transition:transform .15s}
+    input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+    input[type="range"]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;border:none;background:var(--text)}
+    .slider-labels{display:flex;justify-content:space-between;margin-top:9px;font-size:10px;color:var(--text3);font-weight:500}
+    .intensity-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .int-btn{background:var(--surface2);border:1.5px solid var(--border2);border-radius:4px;padding:16px 14px;cursor:pointer;text-align:left;transition:all .18s;font-family:'Space Grotesk',sans-serif}
+    .int-btn:hover:not(.int-active){border-color:var(--text2);background:var(--surface2)}
+    .int-btn.int-active{border-color:var(--text);background:var(--text);color:#fff}
+    .int-name{font-size:13px;font-weight:700;display:block;margin-bottom:4px}
+    .int-zone{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;display:block;transition:color .18s}
+    .int-btn.int-active .int-zone{color:rgba(255,255,255,.45)}
+    .int-desc{font-size:11px;color:var(--text3);line-height:1.5;transition:color .18s}
+    .int-btn.int-active .int-desc{color:rgba(255,255,255,.6)}
+    .fuel-results-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+    .fuel-result-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:20px 20px 18px;position:relative;overflow:hidden}
+    .fuel-result-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;background:var(--fc,var(--text));opacity:.2}
+    .fuel-result-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px}
+    .fuel-result-value{font-family:'Space Grotesk',system-ui,sans-serif;font-size:clamp(26px,4vw,34px);font-weight:700;color:var(--text);line-height:1;letter-spacing:-.5px;margin-bottom:5px;transition:all .3s}
+    .fuel-result-value .unit{font-size:40%;color:var(--text3);font-weight:400;margin-left:2px}
+    .fuel-result-sub{font-size:12px;color:var(--text3)}
+    .fuel-timing-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+    .fuel-timing-card{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:14px 16px}
+    .fuel-timing-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+    .fuel-timing-value{font-size:14px;font-weight:600;color:var(--text2)}
+    .fuel-hint{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:16px 18px;font-size:13px;color:var(--text2);line-height:1.75;margin-bottom:8px}
+    .fuel-hint strong{color:var(--text);font-weight:700}
+    .pack-section{margin-top:32px}
+    .pack-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+    .pack-list{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+    .pack-item{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:12px 14px;display:grid;align-items:center;gap:10px;grid-template-columns:1fr auto auto}
+    .pack-item-name{font-size:13px;font-weight:600;color:var(--text)}
+    .pack-item-detail{font-size:11px;color:var(--text3);margin-top:2px}
+    .qty-control{display:flex;align-items:center;gap:7px}
+    .qty-btn{width:26px;height:26px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);color:var(--text);cursor:pointer;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .15s;line-height:1;font-family:'Space Grotesk',sans-serif}
+    .qty-btn:hover{border-color:var(--text);background:var(--text);color:#fff}
+    .qty-val{font-family:'Space Grotesk',system-ui,sans-serif;font-size:18px;font-weight:700;color:var(--text);min-width:22px;text-align:center}
+    .pack-stock{font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;white-space:nowrap}
+    .pack-stock.ok {background:rgba(45,122,58,.1);color:var(--green);border:1px solid rgba(45,122,58,.2)}
+    .pack-stock.low{background:rgba(184,92,0,.1);color:var(--orange);border:1px solid rgba(184,92,0,.2)}
+    .pack-stock.out{background:rgba(185,28,28,.1);color:var(--red);border:1px solid rgba(185,28,28,.2)}
+    .pack-summary{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:12px 14px;font-size:12px;color:var(--text2);line-height:1.8}
+    .pack-summary strong{color:var(--text)}
+    .pack-empty{font-size:13px;color:var(--text3);padding:16px 0}
+    .stock-list-fc{display:flex;flex-direction:column;gap:6px;margin-bottom:18px}
+    .stock-item-fc{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .stock-name-fc{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px}
+    .stock-meta-fc{font-size:11px;color:var(--text3)}
+    .stock-qty-input{width:64px;text-align:center;font-family:'Space Grotesk',system-ui,sans-serif;font-size:17px;font-weight:700;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:5px 8px;color:var(--text);outline:none}
+    .stock-qty-input:focus{border-color:var(--text)}
+    .add-form-fc{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:20px}
+    .add-form-fc-grid{display:grid;grid-template-columns:1fr 1fr 90px 90px;gap:10px;margin-bottom:12px}
+    .add-form-fc-grid .span2{grid-column:span 2}
+    .fc-divider{height:1px;background:var(--border);margin:28px 0}
+    .fc-sub-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:14px;display:block}
+    .fc-page-sub{font-size:14px;color:var(--text3);line-height:1.6;margin-bottom:36px;max-width:480px}
+    @keyframes fcFadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+    .fc-updated{animation:fcFadeUp .25s ease}
+    @media(max-width:640px){.intensity-grid{grid-template-columns:1fr}.fuel-results-grid,.fuel-timing-grid{grid-template-columns:1fr 1fr}.add-form-fc-grid{grid-template-columns:1fr 1fr}}
   </style>
 </head>
 <body>
@@ -393,6 +489,7 @@
     <button class="tab-btn" onclick="switchTab('coach',this)"><span class="ti">◈</span> Coach Chat</button>
     <button class="tab-btn" onclick="switchTab('health',this)"><span class="ti">♡</span> Gesundheit</button>
     <button class="tab-btn" onclick="switchTab('bike',this)"><span class="ti">⚙</span> Mein Rad</button>
+    <button class="tab-btn" onclick="switchTab('fuel',this)"><span class="ti">🍫</span> Fuel Rechner</button>
   </nav>
 </div>
 
@@ -429,16 +526,6 @@
       <div class="stat-label">Ø Herzfrequenz</div>
       <div><span class="stat-value" id="statHr">–</span><span class="stat-unit">bpm</span></div>
       <div class="stat-sub">Aus Strava-Daten</div>
-    </div>
-  </div>
-
-  <!-- ZIEL -->
-  <div class="card" style="border-top:2px solid var(--purple)">
-    <div class="section-label" style="margin-bottom:8px">Mein Ziel</div>
-    <div class="goal-display" id="goalDisplay">Kein Ziel gesetzt</div>
-    <div style="display:flex;gap:8px;margin-top:8px">
-      <input type="text" class="field" id="goalInput" placeholder="z.B. Ötztaler 24. Aug, 238 km" style="flex:1;margin-bottom:0"/>
-      <button class="btn btn-primary" onclick="saveGoal()" style="white-space:nowrap;padding:8px 14px;font-size:12px">Ziel speichern</button>
     </div>
   </div>
 
@@ -800,6 +887,133 @@ Frag mich etwas oder probiere die Quick-Questions unten aus!</div>
   </div>
 
 </div><!-- /bike -->
+
+
+<!-- ══════════════════════════════════════
+     FUEL CALCULATOR TAB
+══════════════════════════════════════ -->
+<div id="tab-fuel" style="display:none" class="fade">
+
+  <!-- Sub-nav within fuel tab -->
+  <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:36px">
+    <button class="tab-btn active" id="fuel-sub-rechner" onclick="fuelSubTab('rechner',this)" style="padding:11px 18px">⚡ Rechner</button>
+    <button class="tab-btn" id="fuel-sub-bestand" onclick="fuelSubTab('bestand',this)" style="padding:11px 18px">📦 Bestand</button>
+  </div>
+
+  <!-- ── RECHNER ── -->
+  <div id="fuel-panel-rechner">
+    <p class="eyebrow">Ernährungsrechner</p>
+    <h1 style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:clamp(26px,4vw,38px);font-weight:700;line-height:1.1;margin-bottom:10px">Was brauchst du<br>für deine Tour?</h1>
+    <p class="fc-page-sub">Zwei Eingaben. Sofortige Empfehlung — inkl. Packliste aus deinem Bestand.</p>
+
+    <div style="display:flex;flex-direction:column;gap:32px;margin-bottom:40px">
+      <div>
+        <span class="fc-sub-label">1 · Fahrtdauer</span>
+        <div class="duration-display" id="fcDurationDisplay">2<span> h</span></div>
+        <input type="range" id="fcDurationSlider" min="1" max="16" value="4" step="1" oninput="fcOnSlider()">
+        <div class="slider-labels"><span>30 min</span><span>8 h</span></div>
+      </div>
+      <div>
+        <span class="fc-sub-label">2 · Intensität</span>
+        <div class="intensity-grid">
+          <button class="int-btn int-active" onclick="fcSetIntensity('endurance',this)">
+            <span class="int-name">Endurance</span>
+            <span class="int-zone">Zone 2</span>
+            <span class="int-desc">Konversation problemlos möglich.</span>
+          </button>
+          <button class="int-btn" onclick="fcSetIntensity('tempo',this)">
+            <span class="int-name">Tempo</span>
+            <span class="int-zone">Sweetspot</span>
+            <span class="int-desc">Kurze Sätze möglich.</span>
+          </button>
+          <button class="int-btn" onclick="fcSetIntensity('race',this)">
+            <span class="int-name">Race</span>
+            <span class="int-zone">Intervall / Wettkampf</span>
+            <span class="int-desc">Kaum sprechen möglich.</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="fc-divider"></div>
+    <span class="fc-sub-label">Dein Bedarf</span>
+    <div class="fuel-results-grid">
+      <div class="fuel-result-card" style="--fc:#111111">
+        <div class="fuel-result-label">Kohlenhydrate</div>
+        <div class="fuel-result-value" id="fcCarbsVal">–<span class="unit">g</span></div>
+        <div class="fuel-result-sub" id="fcCarbsRate">–</div>
+      </div>
+      <div class="fuel-result-card" style="--fc:#1d4ed8">
+        <div class="fuel-result-label">Flüssigkeit</div>
+        <div class="fuel-result-value" id="fcHydrationVal">–<span class="unit">L</span></div>
+        <div class="fuel-result-sub" id="fcHydrationBottles">–</div>
+      </div>
+    </div>
+    <div class="fuel-timing-grid">
+      <div class="fuel-timing-card">
+        <div class="fuel-timing-label">Essen</div>
+        <div class="fuel-timing-value" id="fcEatTiming">–</div>
+      </div>
+      <div class="fuel-timing-card">
+        <div class="fuel-timing-label">Trinken</div>
+        <div class="fuel-timing-value">Alle 10–20 Min.</div>
+      </div>
+    </div>
+    <div class="fuel-hint" id="fcHintBox">–</div>
+
+    <div class="pack-section">
+      <div class="pack-header">
+        <span class="fc-sub-label" style="margin-bottom:0">Packliste aus deinem Bestand</span>
+        <button class="btn btn-ghost" style="font-size:11px;padding:5px 12px" onclick="fuelSubTab('bestand',document.getElementById('fuel-sub-bestand'))">Bestand verwalten →</button>
+      </div>
+      <div id="fcPackList"></div>
+      <div class="pack-summary" id="fcPackSummary" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- ── BESTAND ── -->
+  <div id="fuel-panel-bestand" style="display:none">
+    <p class="eyebrow">Lager</p>
+    <h1 style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:clamp(26px,4vw,38px);font-weight:700;line-height:1.1;margin-bottom:10px">Dein Bestand</h1>
+    <p class="fc-page-sub">Hinterlege deine Produkte mit Kohlenhydratgehalt pro Portion und deiner aktuellen Stückzahl.</p>
+
+    <span class="fc-sub-label">Produkte</span>
+    <div class="stock-list-fc" id="fcStockList"></div>
+    <div id="fcStockEmpty" style="display:none;font-size:13px;color:var(--text3);padding:14px 0">Noch keine Produkte angelegt. Füge unten dein erstes Produkt hinzu.</div>
+
+    <div class="fc-divider"></div>
+    <span class="fc-sub-label">Produkt hinzufügen</span>
+    <div class="add-form-fc">
+      <div class="add-form-fc-grid">
+        <div class="span2">
+          <label class="field-label">Name</label>
+          <input class="field" id="fcNewName" placeholder="z.B. SIS Beta Fuel Gel" />
+        </div>
+        <div>
+          <label class="field-label">Kategorie</label>
+          <select class="field" id="fcNewCat">
+            <option value="gel">Gel</option>
+            <option value="mus">Fruchtmus / Riegel</option>
+            <option value="drink">Getränkepulver</option>
+            <option value="other">Sonstiges</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label">KH pro Portion (g)</label>
+          <input class="field" id="fcNewCarbs" type="number" min="1" max="200" placeholder="30" />
+        </div>
+        <div>
+          <label class="field-label">Bestand (Stück)</label>
+          <input class="field" id="fcNewQty" type="number" min="0" max="999" placeholder="12" />
+        </div>
+        <div style="display:flex;align-items:flex-end">
+          <button class="btn btn-primary" style="width:100%;justify-content:center;border-radius:999px" onclick="fcAddProduct()">Hinzufügen</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /tab-fuel -->
 
 </main>
 
@@ -1612,7 +1826,256 @@ if(_params.get('error')) showToast('Strava-Verbindung fehlgeschlagen: '+_params.
 if(_params.get('connected')) history.replaceState({},'',location.pathname);
 
 checkStatus();
+// Init fuel calculator when its tab becomes visible
+const _origSwitchTab = switchTab;
+switchTab = function(id, btn) {
+  _origSwitchTab(id, btn);
+  if (id === 'fuel') {
+    fcLoadProductsFromApi().then(() => { fcCalculate(); });
+  }
+};
 </script>
+
+
+// ══════════════════════════════════════════════════
+// FUEL CALCULATOR
+// ══════════════════════════════════════════════════
+
+// ── Fuel sub-tab ───────────────────────────────────
+function fuelSubTab(id, btn) {
+  ['rechner','bestand'].forEach(p => {
+    const el = document.getElementById('fuel-panel-' + p);
+    if (el) el.style.display = p === id ? '' : 'none';
+  });
+  document.querySelectorAll('#tab-fuel .tab-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  if (id === 'bestand') fcRenderStock();
+}
+
+// ── State ──────────────────────────────────────────
+const FC_INTENSITY = {
+  endurance: { carbs: 35, label: '35 g/h' },
+  tempo:     { carbs: 70, label: '70 g/h' },
+  race:      { carbs: 105, label: '105 g/h' },
+};
+let fcIntensity   = 'endurance';
+let fcSteps       = 4;
+let fcTargetCarbs = 0;
+let fcPackQty     = {};
+let fcProducts    = []; // in-memory cache
+
+// ── Slider / Intensity ─────────────────────────────
+function fcOnSlider() {
+  fcSteps = parseInt(document.getElementById('fcDurationSlider').value);
+  fcCalculate();
+}
+function fcSetIntensity(key, btn) {
+  fcIntensity = key;
+  document.querySelectorAll('.int-btn').forEach(b => b.classList.remove('int-active'));
+  btn.classList.add('int-active');
+  fcCalculate();
+}
+
+// ── Calculate ──────────────────────────────────────
+function fcCalculate() {
+  const minutes = fcSteps * 30;
+  const hours   = minutes / 60;
+  const def     = FC_INTENSITY[fcIntensity];
+
+  fcTargetCarbs = Math.round(hours * def.carbs);
+  const totalMl = Math.round(hours * 600);
+  const liters  = (totalMl / 1000).toFixed(1);
+  const bottles = Math.ceil(totalMl / 750);
+
+  const h = Math.floor(minutes / 60), m = minutes % 60;
+  const dur = document.getElementById('fcDurationDisplay');
+  if (!dur) return;
+  if      (h === 0) dur.innerHTML = `${m}<span> min</span>`;
+  else if (m === 0) dur.innerHTML = `${h}<span> h</span>`;
+  else              dur.innerHTML = `${h}<span> h </span>${m}<span style="font-size:45%;color:var(--text3);font-weight:400"> min</span>`;
+
+  document.getElementById('fcCarbsVal').innerHTML      = `${fcTargetCarbs}<span class="unit">g</span>`;
+  document.getElementById('fcCarbsRate').textContent    = def.label;
+  document.getElementById('fcHydrationVal').innerHTML   = `${liters}<span class="unit">L</span>`;
+  document.getElementById('fcHydrationBottles').textContent = `ca. ${bottles} Flasche${bottles !== 1 ? 'n' : ''} à 750 ml`;
+  document.getElementById('fcEatTiming').textContent    = fcIntensity === 'race' ? 'Alle 15–20 Min.' : 'Alle 20–30 Min.';
+
+  let hint;
+  if      (minutes < 60)   hint = '<strong>Kurze Tour.</strong> Wasser reicht meistens völlig aus.';
+  else if (minutes <= 90)  hint = '<strong>Mittlere Tour.</strong> Wasser ist die Basis. Kohlenhydrate sind bei hoher Intensität sinnvoll.';
+  else if (minutes <= 180) hint = '<strong>Längere Tour.</strong> Starte nach 30–45 Minuten mit regelmäßiger Kohlenhydratzufuhr.';
+  else                     hint = '<strong>Lange Tour.</strong> Kohlenhydrate und Flüssigkeit konsequent ab Minute 30 zuführen.';
+  if (fcIntensity === 'race') hint += ' <strong>Hinweis:</strong> Hohe Mengen (>90 g/h) bitte vorher im Training testen.';
+  document.getElementById('fcHintBox').innerHTML = hint;
+
+  ['fcCarbsVal','fcHydrationVal','fcHintBox'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('fc-updated'); void el.offsetWidth; el.classList.add('fc-updated');
+  });
+
+  fcRenderPacklist();
+}
+
+// ── API helpers ───────────────────────────────────
+async function fcLoadProductsFromApi() {
+  try {
+    const d = await api('/fuel/products');
+    fcProducts = (d.products || []).map(p => ({
+      id:    String(p.id),
+      name:  p.name,
+      cat:   p.category,
+      carbs: p.carbs_per_unit,
+      qty:   p.stock
+    }));
+  } catch(e) { /* silent */ }
+}
+
+// ── Packliste ─────────────────────────────────────
+function fcRenderPacklist() {
+  const container = document.getElementById('fcPackList');
+  const summary   = document.getElementById('fcPackSummary');
+  if (!container) return;
+
+  if (!fcProducts.length) {
+    container.innerHTML = '<div class="pack-empty">Noch keine Produkte im Bestand — wechsle zum Tab <strong>Bestand</strong> und lege sie an.</div>';
+    if (summary) summary.style.display = 'none';
+    return;
+  }
+
+  fcProducts.forEach(p => { if (fcPackQty[p.id] === undefined) fcPackQty[p.id] = 0; });
+
+  const totalPacked = fcProducts.reduce((s, p) => s + (fcPackQty[p.id] || 0) * (p.carbs || 0), 0);
+  if (totalPacked === 0 && fcTargetCarbs > 0) fcAutoSuggest();
+
+  let html = '<div class="pack-list">';
+  fcProducts.forEach(p => {
+    const qty = fcPackQty[p.id] || 0;
+    let label, cls;
+    if (qty === 0)        { label = `${p.qty} im Lager`; cls = 'ok'; }
+    else if (qty > p.qty) { label = `Nur ${p.qty} im Lager!`; cls = 'out'; }
+    else { const rem = p.qty - qty; label = `${rem} übrig`; cls = rem < 2 ? 'low' : 'ok'; }
+    const icon = { gel:'🟡', mus:'🍎', drink:'💧', other:'📦' }[p.cat] || '📦';
+    html += `
+      <div class="pack-item">
+        <div>
+          <div class="pack-item-name">${icon} ${fcEsc(p.name)}</div>
+          <div class="pack-item-detail">${p.carbs} g KH pro Portion · ${p.cat === 'drink' ? 'Getränk' : 'Snack'}</div>
+        </div>
+        <div class="qty-control">
+          <button class="qty-btn" onclick="fcChangeQty('${p.id}',-1)">−</button>
+          <div class="qty-val">${qty}</div>
+          <button class="qty-btn" onclick="fcChangeQty('${p.id}',+1)">+</button>
+        </div>
+        <span class="pack-stock ${cls}">${label}</span>
+      </div>`;
+  });
+  html += '</div>';
+  container.innerHTML = html;
+
+  const packed  = fcProducts.reduce((s, p) => s + (fcPackQty[p.id] || 0) * (p.carbs || 0), 0);
+  const diff    = packed - fcTargetCarbs;
+  const diffStr = diff >= 0
+    ? `<span style="color:var(--green)">+${diff} g über Bedarf ✓</span>`
+    : `<span style="color:var(--red)">${diff} g unter Bedarf — pack mehr ein</span>`;
+  if (summary) {
+    summary.style.display = 'block';
+    summary.innerHTML = `<strong>Eingepackt:</strong> ${packed} g KH &nbsp;·&nbsp; <strong>Bedarf:</strong> ${fcTargetCarbs} g KH &nbsp;·&nbsp; ${diffStr}`;
+  }
+}
+
+function fcAutoSuggest() {
+  let remaining = fcTargetCarbs;
+  const sorted  = [...fcProducts].sort((a, b) => b.carbs - a.carbs);
+  fcProducts.forEach(p => fcPackQty[p.id] = 0);
+  for (const p of sorted) {
+    if (remaining <= 0) break;
+    const take = Math.min(Math.ceil(remaining / p.carbs), p.qty);
+    fcPackQty[p.id] = take;
+    remaining -= take * p.carbs;
+  }
+}
+
+function fcChangeQty(id, delta) {
+  fcPackQty[id] = Math.max(0, (fcPackQty[id] || 0) + delta);
+  fcRenderPacklist();
+}
+
+// ── Bestand ───────────────────────────────────────
+async function fcRenderStock() {
+  const list  = document.getElementById('fcStockList');
+  const empty = document.getElementById('fcStockEmpty');
+  if (!list) return;
+  await fcLoadProductsFromApi();
+  const catLabel = { gel:'Gel', mus:'Fruchtmus / Riegel', drink:'Getränkepulver', other:'Sonstiges' };
+  if (!fcProducts.length) {
+    list.innerHTML = '';
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+  list.innerHTML = fcProducts.map(p => `
+    <div class="stock-item-fc">
+      <div style="flex:1;min-width:160px">
+        <div class="stock-name-fc">${fcEsc(p.name)}</div>
+        <div class="stock-meta-fc">${catLabel[p.cat] || p.cat} · ${p.carbs} g KH pro Portion</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+        <span style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Bestand</span>
+        <input class="stock-qty-input" type="number" min="0" max="999"
+          value="${p.qty}" onchange="fcUpdateQty('${p.id}',this.value)" />
+        <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;border-radius:999px;color:var(--red);border-color:rgba(185,28,28,.3)"
+          onclick="fcDeleteProduct('${p.id}')">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+async function fcAddProduct() {
+  const name  = document.getElementById('fcNewName').value.trim();
+  const cat   = document.getElementById('fcNewCat').value;
+  const carbs = parseInt(document.getElementById('fcNewCarbs').value);
+  const qty   = parseInt(document.getElementById('fcNewQty').value);
+  if (!name)              { showToast('Bitte Namen eingeben','error'); return; }
+  if (!carbs || carbs < 1){ showToast('Bitte KH-Gehalt angeben','error'); return; }
+  if (isNaN(qty) || qty < 0) { showToast('Bitte Bestand angeben','error'); return; }
+  try {
+    await api('/fuel/products', { method:'POST', body: JSON.stringify({ name, category: cat, carbs_per_unit: carbs, stock: qty }) });
+    document.getElementById('fcNewName').value  = '';
+    document.getElementById('fcNewCarbs').value = '';
+    document.getElementById('fcNewQty').value   = '';
+    fcPackQty = {};
+    await fcRenderStock();
+    fcRenderPacklist();
+    showToast(name + ' hinzugefügt');
+  } catch(e) { showToast(e.message,'error'); }
+}
+
+async function fcUpdateQty(id, val) {
+  const qty = Math.max(0, parseInt(val) || 0);
+  try {
+    await api('/fuel/products/' + id, { method:'PUT', body: JSON.stringify({ stock: qty }) });
+    const p = fcProducts.find(x => x.id === id);
+    if (p) { p.qty = qty; if ((fcPackQty[id]||0) > qty) fcPackQty[id] = qty; }
+    fcRenderPacklist();
+  } catch(e) { showToast(e.message,'error'); }
+}
+
+async function fcDeleteProduct(id) {
+  if (!confirm('Produkt wirklich löschen?')) return;
+  try {
+    await api('/fuel/products/' + id, { method:'DELETE' });
+    delete fcPackQty[id];
+    await fcRenderStock();
+    fcRenderPacklist();
+    showToast('Produkt gelöscht');
+  } catch(e) { showToast(e.message,'error'); }
+}
+
+function fcEsc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
 </script>
 </body>
 </html>
