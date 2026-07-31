@@ -369,16 +369,71 @@
 
     /* ── RESPONSIVE ── */
     @media(max-width:900px){
-      main{padding:24px 16px;gap:18px}
-      .topbar{padding:0 16px}
-      nav{padding:0 12px}
-      .stat-grid{grid-template-columns:1fr 1fr;gap:1px}
+      main{padding:20px 16px;gap:16px}
+      .topbar{padding:0 16px;height:56px}
+      nav{padding:0 8px}
+      .stat-grid{grid-template-columns:1fr 1fr;gap:10px}
       .act-header{grid-template-columns:1fr 80px 80px 80px 80px;gap:8px}
       .act-header > *:nth-child(6),.act-header > *:nth-child(7){display:none}
     }
-    @media(max-width:600px){
-      .stat-grid{grid-template-columns:1fr 1fr}
-      .logo-sub,.connection-pill > div > div:last-child{display:none}
+    @media(max-width:640px){
+      /* Header */
+      .topbar{padding:0 14px;height:52px;gap:10px}
+      .logo-title{font-size:14px}
+      .logo-sub{display:none}
+      .logo-icon{width:28px;height:28px}
+      .connection-pill{padding:4px 10px;font-size:10px}
+      .connection-pill > div > div:last-child{display:none}
+      #syncBtn{padding:7px 12px;font-size:11px}
+      #syncBtn svg{width:11px;height:11px}
+
+      /* Nav */
+      nav{padding:0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+      nav::-webkit-scrollbar{display:none}
+      .tab-btn{padding:10px 14px;font-size:10px;white-space:nowrap;flex-shrink:0}
+      .tab-btn .ti{font-size:12px}
+
+      /* Main */
+      main{padding:14px 12px;gap:12px}
+
+      /* Stats grid: 2 cols */
+      .stat-grid{grid-template-columns:1fr 1fr;gap:8px}
+      .stat-card{padding:14px 12px}
+      .stat-value{font-size:28px}
+      .stat-label{font-size:9px}
+      .stat-sub{font-size:10px}
+
+      /* Cards */
+      .card{padding:16px 14px}
+      .card-label{font-size:9px}
+
+      /* Chart area: stack vertically */
+      .two-col{grid-template-columns:1fr!important;flex-direction:column}
+
+      /* Activities */
+      .act-header{grid-template-columns:1fr 70px 70px;gap:6px;font-size:11px}
+      .act-header > *:nth-child(4),.act-header > *:nth-child(5),
+      .act-header > *:nth-child(6),.act-header > *:nth-child(7){display:none}
+      .act-item{grid-template-columns:1fr 70px 70px;gap:6px;font-size:12px}
+      .act-item > *:nth-child(4),.act-item > *:nth-child(5),
+      .act-item > *:nth-child(6),.act-item > *:nth-child(7){display:none}
+
+      /* Coach */
+      .coach-input-row{flex-direction:column;gap:8px}
+      .coach-input-row button{width:100%}
+
+      /* HR table */
+      .hr-table th:nth-child(3),.hr-table td:nth-child(3){display:none}
+
+      /* Fuel */
+      .intensity-grid{grid-template-columns:1fr}
+      .fuel-results-grid,.fuel-timing-grid{grid-template-columns:1fr 1fr}
+      .add-form-fc-grid{grid-template-columns:1fr 1fr}
+      .pack-item{grid-template-columns:1fr auto}
+      .pack-stock{display:none}
+
+      /* Modals */
+      .modal-box{padding:20px;margin:16px}
     }
 
     /* ══════════════════════════════════════
