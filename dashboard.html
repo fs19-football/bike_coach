@@ -489,7 +489,7 @@
     <button class="tab-btn" onclick="switchTab('coach',this)"><span class="ti">◈</span> Coach Chat</button>
     <button class="tab-btn" onclick="switchTab('health',this)"><span class="ti">♡</span> Gesundheit</button>
     <button class="tab-btn" onclick="switchTab('bike',this)"><span class="ti">⚙</span> Mein Rad</button>
-    <button class="tab-btn" onclick="switchTab('fuel',this)"><span class="ti">🍫</span> Fuel Rechner</button>
+    <button class="tab-btn" onclick="switchTab('fuel',this)"><span class="ti">◉</span> Fuel Rechner</button>
   </nav>
 </div>
 
@@ -896,8 +896,8 @@ Frag mich etwas oder probiere die Quick-Questions unten aus!</div>
 
   <!-- Sub-nav within fuel tab -->
   <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:36px">
-    <button class="tab-btn active" id="fuel-sub-rechner" onclick="fuelSubTab('rechner',this)" style="padding:11px 18px">⚡ Rechner</button>
-    <button class="tab-btn" id="fuel-sub-bestand" onclick="fuelSubTab('bestand',this)" style="padding:11px 18px">📦 Bestand</button>
+    <button class="tab-btn active" id="fuel-sub-rechner" onclick="fuelSubTab('rechner',this)" style="padding:11px 18px">◎ Rechner</button>
+    <button class="tab-btn" id="fuel-sub-bestand" onclick="fuelSubTab('bestand',this)" style="padding:11px 18px">▤ Bestand</button>
   </div>
 
   <!-- ── RECHNER ── -->
@@ -968,6 +968,9 @@ Frag mich etwas oder probiere die Quick-Questions unten aus!</div>
       </div>
       <div id="fcPackList"></div>
       <div class="pack-summary" id="fcPackSummary" style="display:none"></div>
+      <div id="fcConfirmWrap" style="display:none;margin-top:16px;text-align:right">
+        <button class="btn btn-primary" onclick="fcConfirmPack()" style="font-size:13px;padding:10px 22px;letter-spacing:.03em">Let's roll</button>
+      </div>
     </div>
   </div>
 
@@ -1834,8 +1837,7 @@ switchTab = function(id, btn) {
     fcLoadProductsFromApi().then(() => { fcCalculate(); });
   }
 };
-</script>
-<script>
+
 // ══════════════════════════════════════════════════
 // FUEL CALCULATOR
 // ══════════════════════════════════════════════════
@@ -1977,6 +1979,8 @@ function fcRenderPacklist() {
   const diffStr = diff >= 0
     ? `<span style="color:var(--green)">+${diff} g über Bedarf ✓</span>`
     : `<span style="color:var(--red)">${diff} g unter Bedarf — pack mehr ein</span>`;
+  const confirmWrap = document.getElementById('fcConfirmWrap');
+  if (confirmWrap) confirmWrap.style.display = packed > 0 ? 'block' : 'none';
   if (summary) {
     summary.style.display = 'block';
     summary.innerHTML = `<strong>Eingepackt:</strong> ${packed} g KH &nbsp;·&nbsp; <strong>Bedarf:</strong> ${fcTargetCarbs} g KH &nbsp;·&nbsp; ${diffStr}`;
@@ -2075,6 +2079,34 @@ function fcEsc(s) {
     ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
+
+// ── Confirm Pack (Bestand abbuchen) ───────────────
+async function fcConfirmPack() {
+  const items = fcProducts.filter(p => (fcPackQty[p.id] || 0) > 0);
+  if (!items.length) return;
+
+  // Optimistic UI
+  const btn = document.querySelector('#fcConfirmWrap .btn-primary');
+  if (btn) { btn.disabled = true; btn.textContent = 'Wird gespeichert…'; }
+
+  let failed = 0;
+  for (const p of items) {
+    const newStock = Math.max(0, p.qty - (fcPackQty[p.id] || 0));
+    try {
+      await api('/fuel/products/' + p.id, {
+        method: 'PUT',
+        body: JSON.stringify({ name: p.name, category: p.cat, carbs_per_unit: p.carbs, unit: 'Stück', stock: newStock })
+      });
+      p.qty = newStock;
+      fcPackQty[p.id] = 0;
+    } catch(e) { failed++; }
+  }
+
+  await fcLoadProductsFromApi();
+  fcRenderPacklist();
+  if (failed === 0) showToast("Bestand aktualisiert — lets roll!");
+  else showToast('Einige Produkte konnten nicht gespeichert werden', 'error');
+}
 </script>
 </body>
 </html>
