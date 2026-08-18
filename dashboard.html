@@ -500,9 +500,42 @@
     @keyframes fcFadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
     .fc-updated{animation:fcFadeUp .25s ease}
     @media(max-width:640px){.intensity-grid{grid-template-columns:1fr}.fuel-results-grid,.fuel-timing-grid{grid-template-columns:1fr 1fr}.add-form-fc-grid{grid-template-columns:1fr 1fr}}
+
+    /* ── LOGIN ── */
+    body:not(.is-authenticated) > header,
+    body:not(.is-authenticated) > .nav-wrap,
+    body:not(.is-authenticated) > main { display:none; }
+    .login-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;z-index:1000}
+    .login-card{width:min(420px,100%);background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:32px;box-shadow:0 16px 50px rgba(0,0,0,.08)}
+    .login-mark{width:48px;height:48px;border-radius:50%;overflow:hidden;margin-bottom:18px;border:1px solid var(--border)}
+    .login-mark img{width:100%;height:100%;object-fit:cover}
+    .login-title{font-size:26px;font-weight:700;letter-spacing:-.5px;margin-bottom:6px}
+    .login-subtitle{font-size:13px;color:var(--text3);line-height:1.6;margin-bottom:24px}
+    .login-error{display:none;background:rgba(185,28,28,.08);border:1px solid rgba(185,28,28,.25);color:var(--red);padding:10px 12px;border-radius:4px;font-size:12px;line-height:1.5;margin-bottom:14px}
+    .login-btn{width:100%;justify-content:center;margin-top:8px}
+    .logout-btn{display:none}
+    body.is-authenticated .login-overlay{display:none}
+    @media(max-width:640px){.login-card{padding:24px}.logout-btn{display:inline-flex}}
   </style>
 </head>
 <body>
+
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
+    <div class="login-mark"><img src="apple-touch-icon.png" alt="FS Cycling"></div>
+    <div class="login-title">KI-Radcoach</div>
+    <div class="login-subtitle">Melde dich an, um auf dein persönliches Trainings-Dashboard zuzugreifen.</div>
+    <div class="login-error" id="loginError"></div>
+    <form onsubmit="event.preventDefault();loginUser();">
+      <label class="field-label" for="loginEmail">E-Mail</label>
+      <input class="field" id="loginEmail" type="email" autocomplete="username" value="stoehr_frank@gmx.de" required>
+      <label class="field-label" for="loginPassword" style="margin-top:14px">Passwort</label>
+      <input class="field" id="loginPassword" type="password" autocomplete="current-password" required>
+      <button class="btn btn-primary login-btn" id="loginBtn" type="submit">Anmelden</button>
+    </form>
+  </div>
+</div>
+
 
 <!-- ══════════════════════════════════════════
      HEADER
@@ -526,6 +559,9 @@
         <div id="lastSyncText" style="font-size:9px;color:var(--text3);font-weight:500;margin-top:1px"></div>
       </div>
     </div>
+
+    <button class="btn btn-ghost logout-btn" onclick="logoutUser()" id="logoutBtn" title="Abmelden">Abmelden</button>
+    <button class="btn btn-ghost" onclick="createAdditionalUser()" id="adminUserBtn" style="display:none" title="Weiteren Nutzer anlegen">+ Nutzer</button>
 
     <button class="btn btn-danger" onclick="connectOrSync()" id="syncBtn">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1120,15 +1156,80 @@ Frag mich etwas oder probiere die Quick-Questions unten aus!</div>
 <script>
 // ── API / Config ───────────────────────────
 const WORKER_URL='https://radcoach-worker.bmx282.workers.dev';
-const API_KEY='RadcoachFrank2026!';
+let sessionToken=sessionStorage.getItem('radcoach_session')||null;
+let currentUser=null;
 const api=async(path,opts={})=>{
-  const r=await fetch(WORKER_URL+path,{...opts,headers:{'X-API-Key':API_KEY,'Content-Type':'application/json',...(opts.headers||{})}});
+  const headers={'Content-Type':'application/json',...(opts.headers||{})};
+  if(sessionToken) headers.Authorization='Bearer '+sessionToken;
+  const r=await fetch(WORKER_URL+path,{...opts,headers});
   let d={}; try{d=await r.json()}catch(e){}
+  if(r.status===401 && path!=='/auth/login'){
+    sessionToken=null; currentUser=null; sessionStorage.removeItem('radcoach_session');
+    document.body.classList.remove('is-authenticated');
+    showLoginError('Deine Sitzung ist abgelaufen. Bitte erneut anmelden.');
+  }
   if(!r.ok) throw new Error(d.error||('HTTP '+r.status));
   return d;
 };
 const $=id=>document.getElementById(id);
 let connected=false, chatHistory=[], activities=[], maintLog=[], activeBikeData=null, archivedBikesData=[];
+
+
+// ── Login / Benutzer ───────────────────────
+function showLoginError(message){
+  const el=$('loginError'); if(!el) return;
+  el.textContent=message||''; el.style.display=message?'block':'none';
+}
+function showLogin(){
+  document.body.classList.remove('is-authenticated');
+  const p=$('loginPassword'); if(p) p.value='';
+  setTimeout(()=>$('loginEmail')?.focus(),50);
+}
+function setAuthenticated(user){
+  currentUser=user||null;
+  document.body.classList.add('is-authenticated');
+  showLoginError('');
+  const adminBtn=$('adminUserBtn');
+  if(adminBtn) adminBtn.style.display=currentUser?.role==='admin'?'inline-flex':'none';
+}
+async function loginUser(){
+  const email=$('loginEmail')?.value.trim();
+  const password=$('loginPassword')?.value||'';
+  const btn=$('loginBtn');
+  if(!email||!password){showLoginError('Bitte E-Mail und Passwort eingeben.');return;}
+  if(btn){btn.disabled=true;btn.textContent='Anmeldung…';}
+  try{
+    const d=await api('/auth/login',{method:'POST',body:JSON.stringify({email,password})});
+    sessionToken=d.token; currentUser=d.user; sessionStorage.setItem('radcoach_session',sessionToken);
+    setAuthenticated(currentUser);
+    await checkStatus();
+  }catch(e){showLoginError(e.message||'Anmeldung fehlgeschlagen.');}
+  finally{if(btn){btn.disabled=false;btn.textContent='Anmelden';}}
+}
+async function logoutUser(){
+  try{if(sessionToken) await api('/auth/logout',{method:'POST'});}catch(e){}
+  sessionToken=null; currentUser=null; sessionStorage.removeItem('radcoach_session');
+  chatHistory=[]; showLogin();
+}
+async function createAdditionalUser(){
+  if(currentUser?.role!=='admin') return;
+  const email=prompt('E-Mail des neuen Nutzers:'); if(!email) return;
+  const name=prompt('Name des neuen Nutzers:',email); if(name===null) return;
+  const password=prompt('Temporäres Passwort (mindestens 12 Zeichen):'); if(!password) return;
+  try{
+    await api('/auth/users',{method:'POST',body:JSON.stringify({email,name,password})});
+    showToast('Nutzer angelegt. Zugangsdaten sicher übergeben.');
+  }catch(e){showToast(e.message,'error');}
+}
+async function initAuth(){
+  showLogin();
+  if(!sessionToken) return;
+  try{
+    const d=await api('/auth/me');
+    setAuthenticated(d.user);
+    await checkStatus();
+  }catch(e){showLogin();}
+}
 
 function dateToday(){return new Date().toISOString().slice(0,10)}
 function fmtDate(iso){ if(!iso) return '–'; const p=String(iso).slice(0,10).split('-'); return p.length===3?`${p[2]}.${p[1]}.${p[0]}`:iso }
@@ -1883,7 +1984,7 @@ const _params=new URLSearchParams(location.search);
 if(_params.get('error')) showToast('Strava-Verbindung fehlgeschlagen: '+_params.get('error'),'error');
 if(_params.get('connected')) history.replaceState({},'',location.pathname);
 
-checkStatus();
+initAuth();
 // Init fuel calculator when its tab becomes visible
 const _origSwitchTab = switchTab;
 switchTab = function(id, btn) {
