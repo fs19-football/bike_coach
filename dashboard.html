@@ -1329,6 +1329,7 @@ function switchTab(id, btn) {
   btn.classList.add('active')
   if(id==='dashboard') setTimeout(()=>{drawLoadChart();},50)
   if(id==='health') setTimeout(()=>{drawHrChart();},50)
+  if(id==='bike') setTimeout(()=>{loadBike();},50)
 }
 
 // ── Connection / Sync ──────────────────────
