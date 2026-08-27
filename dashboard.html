@@ -51,6 +51,12 @@
 
     .spin{animation:spin .8s linear infinite;display:inline-block}
     .fade{animation:fadeUp .25s ease}
+    .goal-card{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--purple);border-radius:4px;padding:20px 24px;display:none}
+    .goal-card.visible{display:block;animation:fadeUp .25s ease}
+    .goal-title{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;letter-spacing:.2px;color:var(--text)}
+    .goal-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+    .goal-chip{background:var(--surface2);border:1px solid var(--border2);border-radius:999px;padding:4px 10px;font-size:11px;color:var(--text2)}
+    .goal-empty{font-size:13px;color:var(--text3);line-height:1.6}
 
     /* ── HEADER ── */
     header{
@@ -594,6 +600,13 @@
   <div class="demo-bar" id="notice" style="display:none">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
     <span id="noticeText">Noch keine Verbindung zu Strava. Verbinde dein Konto, um echte Touren zu laden.</span>
+  </div>
+
+  <div class="goal-card" id="activeGoalCard">
+    <div class="section-label" style="margin-bottom:7px">Aktives Trainingsziel</div>
+    <div class="goal-title" id="activeGoalTitle">-</div>
+    <div class="goal-meta" id="activeGoalMeta"></div>
+    <div class="goal-empty" id="activeGoalDescription" style="margin-top:10px"></div>
   </div>
 
   <!-- STAT CARDS -->
@@ -1298,21 +1311,44 @@ function findMaintBaseline(m){
 // ── Weekly Stats / Heatmap ─────────────────
 
 // ── Ziel ───────────────────────────────────
+function goalDateDE(value){
+  if(!value) return null;
+  const p=String(value).slice(0,10).split('-');
+  return p.length===3?`${p[2]}.${p[1]}.${p[0]}`:String(value);
+}
+function renderActiveGoal(goal){
+  const card=$('activeGoalCard'); if(!card) return;
+  if(!goal){ card.classList.remove('visible'); return; }
+  card.classList.add('visible');
+  $('activeGoalTitle').textContent=goal.title||goal.goal||'Trainingsziel';
+  const chips=[];
+  if(goal.event_date) chips.push(`Datum: ${goalDateDE(goal.event_date)}`);
+  if(goal.distance_km!=null) chips.push(`${goal.distance_km} km`);
+  if(goal.elevation_m!=null) chips.push(`${Number(goal.elevation_m).toLocaleString('de-DE')} hm`);
+  if(goal.target_time_min!=null) chips.push(`Zielzeit: ${Math.floor(goal.target_time_min/60)} h ${String(goal.target_time_min%60).padStart(2,'0')} min`);
+  $('activeGoalMeta').innerHTML=chips.map(x=>`<span class="goal-chip">${esc(x)}</span>`).join('');
+  $('activeGoalDescription').textContent=goal.description||'';
+}
 async function loadGoal(){
   try{
     const d=await api('/goal');
-    if(d.goal){
-      $('goalDisplay').textContent=d.goal;
-      if($('goalInput')) $('goalInput').value=d.goal;
-    }
+    renderActiveGoal(d.goal||null);
+    if($('goalDisplay')) $('goalDisplay').textContent=d.goal?.description||d.goal?.goal||'Noch kein aktives Ziel';
+    if($('goalInput')) $('goalInput').value=d.goal?.description||d.goal?.goal||'';
+  }catch(e){ /* silent */ }
+}
+async function loadGoalDraft(){
+  try{
+    const d=await api('/goal/draft');
+    if(d.draft) showToast('Ein Zielentwurf wartet im Coach-Chat auf deine Bestaetigung.');
   }catch(e){ /* silent */ }
 }
 async function saveGoal(){
   const val=$('goalInput')?.value?.trim(); if(!val){showToast('Bitte Ziel eingeben','error');return;}
   try{
     await api('/goal',{method:'POST',body:JSON.stringify({goal:val})});
-    $('goalDisplay').textContent=val;
-    showToast('Ziel gespeichert');
+    showToast('Ziel als Entwurf angelegt. Bitte im Coach-Chat mit Ja bestaetigen.');
+    switchTab('coach',document.querySelectorAll('.tab-btn')[2]);
   }catch(e){ showToast(e.message,'error') }
 }
 
@@ -1412,6 +1448,7 @@ async function loadDashboard(){
 
     const f=d.form||{};
     const ctl=Number(f.ctl||0), atl=Number(f.atl||0), tsb=Number(f.tsb||0);
+    renderActiveGoal(d.goal||null);
     $('ctlVal').textContent=ctl.toFixed(1);
     $('atlVal').textContent=atl.toFixed(1);
     $('tsbVal').textContent=(tsb>=0?'+':'')+tsb.toFixed(1);
@@ -1431,7 +1468,7 @@ async function loadDashboard(){
       $('lastTourTime').textContent=t.moving_time_s?formatTime(t.moving_time_s):'–';
       $('lastTourEle').textContent=t.elevation_m??'–';
       $('lastTourHr').textContent=t.avg_hr??'–';
-      $('lastTourTss').textContent=t.hrtss??t.tss??'–';
+      $('lastTourTss').textContent=t.hr_tss??t.hrtss??t.tss??'–';
       const btn=$('analyzeLastBtn'); btn.disabled=false;
       btn.onclick=()=>startAnalysis(t.strava_id);
     }
@@ -1442,8 +1479,8 @@ async function drawLoadChart() {
   const canvas=document.getElementById('loadChart'); if(!canvas) return
   const cont=document.getElementById('chartContainer'); if(!cont) return
   try{
-    const d=await api('/activities?limit=90');
-    chartData=(d.activities||[]).slice().reverse().map(x=>({ctl:x.ctl||0,atl:x.atl||0,tsb:x.tsb||0,km:x.distance_km||null}));
+    const d=await api('/form/history?days=90');
+    chartData=(d.history||[]).map(x=>({ctl:x.ctl||0,atl:x.atl||0,tsb:x.tsb||0,km:x.km||null,date:x.date,tss:x.tss||0}));
   }catch(e){ /* leave chartData as-is */ }
 
   const W=cont.clientWidth||700, H=cont.clientHeight||240
@@ -1665,6 +1702,10 @@ async function sendMsg(txt){
     const d=await api('/coach/chat',{method:'POST',body:JSON.stringify({message:txt,history:priorHistory,model:chatModel})});
     const t=document.getElementById('typing');if(t)t.remove()
     addMsg('assistant',d.reply||'Keine Antwort erhalten.')
+    if(d.goal_saved){
+      renderActiveGoal(d.goal||null);
+      await loadDashboard();
+    }
   }catch(e){
     const t=document.getElementById('typing');if(t)t.remove()
     addMsg('assistant','Fehler: '+e.message)
