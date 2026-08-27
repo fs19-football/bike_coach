@@ -105,6 +105,7 @@
     .tab-btn .ti{font-size:13px}
     .tab-btn:hover:not(.active){color:var(--text2)}
     .tab-btn.active{color:var(--text);border-bottom-color:var(--text);font-weight:700}
+    .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 
     /* ── MAIN ── */
     main{max-width:1280px;margin:0 auto;padding:36px 32px;display:flex;flex-direction:column;gap:28px}
@@ -415,6 +416,7 @@
 
       /* Chart area: stack vertically */
       .two-col{grid-template-columns:1fr!important;flex-direction:column}
+      .settings-grid{grid-template-columns:1fr}
 
       /* Activities */
       .act-header{grid-template-columns:1fr 70px 70px;gap:6px;font-size:11px}
@@ -587,6 +589,7 @@
     <button class="tab-btn" onclick="switchTab('health',this)"><span class="ti">♡</span> Gesundheit</button>
     <button class="tab-btn" onclick="switchTab('bike',this)"><span class="ti">⚙</span> Mein Rad</button>
     <button class="tab-btn" onclick="switchTab('fuel',this)"><span class="ti">◉</span> Fuel Rechner</button>
+    <button class="tab-btn" onclick="switchTab('settings',this)"><span class="ti">⚙</span> Einstellungen</button>
   </nav>
 </div>
 
@@ -1122,6 +1125,129 @@ Frag mich etwas oder probiere die Quick-Questions unten aus!</div>
 
 </div><!-- /tab-fuel -->
 
+<!-- ══════════════════════════════════════════
+     EINSTELLUNGEN: COACH- UND LEISTUNGSPROFIL
+══════════════════════════════════════════ -->
+<div id="tab-settings" style="display:none" class="fade">
+  <div style="margin-bottom:22px">
+    <div class="section-label">Deine persönliche Coaching-Basis</div>
+    <h1 style="font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:700;line-height:1.05;margin-bottom:8px">Coach- & Leistungsprofil</h1>
+    <p style="font-size:13px;color:var(--text3);line-height:1.7;max-width:720px">Diese Angaben werden pro Benutzer gespeichert und bei Chat, Tourenanalyse und Trainingsplanung an Claude übergeben. Fehlende Werte bleiben unberücksichtigt.</p>
+  </div>
+
+  <div class="settings-grid">
+    <div>
+      <div class="section-label">Wie soll dein Coach arbeiten?</div>
+      <div class="card" style="border-top:2px solid var(--purple)">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div>
+            <label class="field-label">Bevorzugte Sprache</label>
+            <select class="field" id="coachLanguage">
+              <option>Deutsch</option><option>English</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label">Antwortstil</label>
+            <select class="field" id="coachStyle">
+              <option value="direkt und datenbasiert">Direkt und datenbasiert</option>
+              <option value="kurz und pragmatisch">Kurz und pragmatisch</option>
+              <option value="ausfuehrlich und erklaerend">Ausführlich und erklärend</option>
+              <option value="motivierend, aber sachlich">Motivierend, aber sachlich</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label">Trainingsfokus</label>
+            <input class="field" id="coachFocus" placeholder="z.B. Grundlagenausdauer, lange Anstiege, Tempo" />
+          </div>
+          <div>
+            <label class="field-label">Bevorzugte Trainingseinheiten</label>
+            <input class="field" id="coachSessions" placeholder="z.B. lange Ausfahrt, Intervalle, lockere Fahrt" />
+          </div>
+          <div>
+            <label class="field-label">Verfügbare Trainingstage</label>
+            <input class="field" id="coachDays" placeholder="z.B. Dienstag, Donnerstag, Samstag" />
+          </div>
+          <div>
+            <label class="field-label">Maximale Trainingszeit pro Woche (Stunden)</label>
+            <input class="field" id="coachMaxHours" type="number" min="0" max="40" step="0.5" placeholder="z.B. 8" />
+          </div>
+          <div>
+            <label class="field-label">Weitere Hinweise</label>
+            <textarea class="field" id="coachNotes" rows="4" style="resize:vertical" placeholder="z.B. Arbeitszeiten, bevorzugte Strecken, Verletzungen oder Einschränkungen"></textarea>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-top:4px">
+            <span id="coachProfileUpdated" style="font-size:11px;color:var(--text3)"></span>
+            <button class="btn btn-primary" onclick="saveCoachProfile()">Coach-Profil speichern</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">Welche Werte soll der Coach verwenden?</div>
+      <div class="card" style="border-top:2px solid var(--red)">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div>
+              <label class="field-label">HFmax (bpm)</label>
+              <input class="field" id="perfMaxHr" type="number" min="120" max="240" placeholder="z.B. 185" />
+            </div>
+            <div>
+              <label class="field-label">Ruhepuls-Basiswert</label>
+              <input class="field" id="perfRestingHr" type="number" min="30" max="100" placeholder="z.B. 50" />
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div>
+              <label class="field-label">LTHR (bpm)</label>
+              <input class="field" id="perfLthr" type="number" min="80" max="220" placeholder="z.B. 165" />
+            </div>
+            <div>
+              <label class="field-label">LTHR-Methode</label>
+              <select class="field" id="perfLthrMethod">
+                <option value="">Nicht angegeben</option><option>20-Minuten-Test</option><option>30-Minuten-Test</option><option>Feldtest</option><option>Erfahrung / Schätzung</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div>
+              <label class="field-label">LTHR-Testdatum</label>
+              <input class="field" id="perfLthrDate" type="date" />
+            </div>
+            <div>
+              <label class="field-label">Vertrauensgrad</label>
+              <select class="field" id="perfLthrTrust">
+                <option value="">Nicht angegeben</option><option value="hoch">Hoch</option><option value="mittel">Mittel</option><option value="niedrig">Niedrig</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="field-label">Zonenmodell</label>
+            <select class="field" id="perfZoneModel">
+              <option value="lthr">LTHR-basiert</option><option value="max_hr">HFmax-basiert</option>
+            </select>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div>
+              <label class="field-label">Körpergewicht (kg, optional)</label>
+              <input class="field" id="perfWeight" type="number" min="30" max="250" step="0.1" placeholder="z.B. 82.5" />
+            </div>
+            <div>
+              <label class="field-label">FTP (W, optional)</label>
+              <input class="field" id="perfFtp" type="number" min="50" max="600" placeholder="z.B. 240" />
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--text3);line-height:1.7;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:4px">Die Werte sind persönliche Referenzen für Training und Analyse. Sie ersetzen keine medizinische Beratung. FTP wird nur verwendet, wenn du einen Leistungsmesser und einen verlässlichen Wert hinterlegt hast.</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-top:4px">
+            <span id="performanceProfileUpdated" style="font-size:11px;color:var(--text3)"></span>
+            <button class="btn btn-primary" onclick="savePerformanceProfile()">Leistungsprofil speichern</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /tab-settings -->
+
 </main>
 
 <div id="toastEl" style="display:none" class="toast-msg"></div>
@@ -1343,6 +1469,79 @@ async function loadGoalDraft(){
     if(d.draft) showToast('Ein Zielentwurf wartet im Coach-Chat auf deine Bestaetigung.');
   }catch(e){ /* silent */ }
 }
+
+function setProfileValue(id, value){
+  const el=$(id); if(el) el.value=value ?? '';
+}
+function showProfileUpdated(id, value){
+  const el=$(id); if(el) el.textContent=value ? `Zuletzt gespeichert: ${fmtDateTime(value)}` : '';
+}
+function fmtDateTime(value){
+  const d=new Date(String(value).replace(' ','T')+'Z');
+  return Number.isNaN(d.getTime()) ? String(value) : d.toLocaleString('de-DE',{dateStyle:'short',timeStyle:'short'});
+}
+async function loadProfiles(){
+  try{
+    const [coachData, performanceData]=await Promise.all([api('/profile/coach'),api('/profile/performance')]);
+    const c=coachData.profile||{};
+    setProfileValue('coachLanguage',c.language||'Deutsch');
+    setProfileValue('coachStyle',c.style||'direkt und datenbasiert');
+    setProfileValue('coachFocus',c.training_focus);
+    setProfileValue('coachSessions',c.preferred_sessions);
+    setProfileValue('coachDays',c.days);
+    setProfileValue('coachMaxHours',c.max_hours);
+    setProfileValue('coachNotes',c.notes);
+    showProfileUpdated('coachProfileUpdated',c.updated_at);
+
+    const p=performanceData.profile||{};
+    setProfileValue('perfMaxHr',p.max_hr);
+    setProfileValue('perfRestingHr',p.resting_hr);
+    setProfileValue('perfLthr',p.lthr);
+    setProfileValue('perfLthrMethod',p.lthr_method);
+    setProfileValue('perfLthrDate',p.lthr_date);
+    setProfileValue('perfLthrTrust',p.lthr_trust);
+    setProfileValue('perfZoneModel',p.zone_model||'lthr');
+    setProfileValue('perfWeight',p.weight_kg);
+    setProfileValue('perfFtp',p.ftp);
+    showProfileUpdated('performanceProfileUpdated',p.updated_at);
+  }catch(e){ if(connected) showToast('Profile konnten nicht geladen werden: '+e.message,'error'); }
+}
+async function saveCoachProfile(){
+  const btn=document.querySelector('#tab-settings button[onclick="saveCoachProfile()"]');
+  if(btn){btn.disabled=true;btn.textContent='Wird gespeichert…';}
+  try{
+    const d=await api('/profile/coach',{method:'PUT',body:JSON.stringify({
+      language:$('coachLanguage')?.value,
+      style:$('coachStyle')?.value,
+      training_focus:$('coachFocus')?.value,
+      preferred_sessions:$('coachSessions')?.value,
+      days:$('coachDays')?.value,
+      max_hours:$('coachMaxHours')?.value,
+      notes:$('coachNotes')?.value
+    })});
+    const p=d.profile||{}; showProfileUpdated('coachProfileUpdated',p.updated_at); showToast('Coach-Profil gespeichert');
+  }catch(e){showToast(e.message,'error')}
+  finally{if(btn){btn.disabled=false;btn.textContent='Coach-Profil speichern';}}
+}
+async function savePerformanceProfile(){
+  const btn=document.querySelector('#tab-settings button[onclick="savePerformanceProfile()"]');
+  if(btn){btn.disabled=true;btn.textContent='Wird gespeichert…';}
+  try{
+    const d=await api('/profile/performance',{method:'PUT',body:JSON.stringify({
+      max_hr:$('perfMaxHr')?.value,
+      resting_hr:$('perfRestingHr')?.value,
+      lthr:$('perfLthr')?.value,
+      lthr_method:$('perfLthrMethod')?.value,
+      lthr_date:$('perfLthrDate')?.value,
+      lthr_trust:$('perfLthrTrust')?.value,
+      zone_model:$('perfZoneModel')?.value,
+      weight_kg:$('perfWeight')?.value,
+      ftp:$('perfFtp')?.value
+    })});
+    const p=d.profile||{}; showProfileUpdated('performanceProfileUpdated',p.updated_at); showToast('Leistungsprofil gespeichert');
+  }catch(e){showToast(e.message,'error')}
+  finally{if(btn){btn.disabled=false;btn.textContent='Leistungsprofil speichern';}}
+}
 async function saveGoal(){
   const val=$('goalInput')?.value?.trim(); if(!val){showToast('Bitte Ziel eingeben','error');return;}
   try{
@@ -1366,6 +1565,7 @@ function switchTab(id, btn) {
   if(id==='dashboard') setTimeout(()=>{drawLoadChart();},50)
   if(id==='health') setTimeout(()=>{drawHrChart();},50)
   if(id==='bike') setTimeout(()=>{loadBike();},50)
+  if(id==='settings') setTimeout(()=>{loadProfiles();},50)
 }
 
 // ── Connection / Sync ──────────────────────
@@ -1397,7 +1597,7 @@ async function checkStatus(){
     const d=await api('/auth/status');
     setStatus(!!d.connected, d.connected?'Strava verbunden':'Strava nicht verbunden', d.last_sync);
     if(d.connected){
-      await Promise.all([loadDashboard(), loadActivities(), loadHr(), loadBike(), loadGoal()]);
+      await Promise.all([loadDashboard(), loadActivities(), loadHr(), loadBike(), loadGoal(), loadProfiles()]);
     } else {
       await Promise.all([loadActivities(), loadGoal()]);
     }
