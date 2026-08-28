@@ -779,6 +779,7 @@ Claude analysiert dann:
       <div class="model-toggle">
         <button id="btn-haiku" class="model-btn active" onclick="setModel('haiku')">⚡ Haiku</button>
         <button id="btn-sonnet" class="model-btn" onclick="setModel('sonnet')">◈ Sonnet</button>
+        <button class="model-btn" onclick="clearChatHistory()" title="Gespeicherten Chatverlauf löschen">Chat leeren</button>
       </div>
     </div>
 
@@ -1585,9 +1586,9 @@ async function checkStatus(){
     const d=await api('/auth/status');
     setStatus(!!d.connected, d.connected?'Strava verbunden':'Strava nicht verbunden', d.last_sync);
     if(d.connected){
-      await Promise.all([loadDashboard(), loadActivities(), loadHr(), loadBike(), loadGoal(), loadProfiles()]);
+      await Promise.all([loadDashboard(), loadActivities(), loadHr(), loadBike(), loadGoal(), loadProfiles(), loadChatHistory()]);
     } else {
-      await Promise.all([loadActivities(), loadGoal()]);
+      await Promise.all([loadActivities(), loadGoal(), loadChatHistory()]);
     }
   }catch(e){
     setStatus(false,'Worker nicht erreichbar');
@@ -1871,6 +1872,31 @@ function addMsg(role,text){
   div.innerHTML=`<div style="width:30px;height:30px;border-radius:6px;background:${avBg};border:1px solid ${isUser?'var(--border2)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;font-weight:700;color:#fff">${avLabel}</div>
     <div style="max-width:80%;background:var(--surface2);border:1px solid ${bubbleBorder};border-radius:${br};padding:11px 14px;font-size:13px;line-height:1.75;color:var(--text2);${isUser?'white-space:pre-wrap':''}">${bodyHtml}</div>`
   wrap.appendChild(div); wrap.scrollTop=wrap.scrollHeight
+}
+async function loadChatHistory(){
+  try{
+    const d=await api('/coach/history?limit=200');
+    const messages=d.messages||[];
+    const wrap=$('chatMsgs');
+    if(!wrap) return;
+    if(!messages.length) return;
+    wrap.innerHTML='';
+    chatHistory=[];
+    messages.forEach(m=>addMsg(m.role,m.content,{fromHistory:true}));
+  }catch(e){
+    // Der Chat bleibt nutzbar, auch wenn die Verlaufstabelle noch nicht migriert ist.
+    console.warn('Chatverlauf konnte nicht geladen werden',e);
+  }
+}
+async function clearChatHistory(){
+  if(!confirm('Gespeicherten Coach-Chat wirklich löschen?')) return;
+  try{
+    await api('/coach/history',{method:'DELETE'});
+    chatHistory=[];
+    const wrap=$('chatMsgs');
+    if(wrap) wrap.innerHTML='';
+    showToast('Chatverlauf gelöscht');
+  }catch(e){showToast(e.message,'error');}
 }
 function addTyping(){
   const wrap=document.getElementById('chatMsgs')
